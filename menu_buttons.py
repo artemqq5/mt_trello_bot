@@ -5,8 +5,11 @@ def setStartButton():
     markup = types.ReplyKeyboardMarkup()
 
     listButtons = (
-        types.KeyboardButton('Добавить пользователя ➕'),
-        types.KeyboardButton('Удалить пользователя ➖'),
+        types.KeyboardButton('Gambling FB'),
+        types.KeyboardButton('Gambling PPC'),
+        types.KeyboardButton('Gambling UAC'),
+        types.KeyboardButton('AF Manager'),
+        types.KeyboardButton('Schema'),
         # types.KeyboardButton('Создать карточку'),
     )
 

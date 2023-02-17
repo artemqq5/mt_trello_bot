@@ -25,37 +25,20 @@ def connect_db():
     )
 
 
-# check authorization user
-def check_auth(user_id):
-    try:
-        with connect_db() as connection:
-            with connection.cursor() as cursor:
-                check_user_command = f"SELECT * FROM users_tb WHERE id_user = {user_id};"
-
-                cursor.execute(check_user_command)
-                result = len(cursor.fetchall()) > 0
-
-            connection.commit()
-            return ResponseDB(result, "good")
-    except Exception as e:
-        print(f" user auth error: {e}")
-        return ResponseDB(False, "error")
-
-
 # add user to db
 def add_user(user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                add_user_command = "INSERT INTO users_tb VALUES ('{0}','{1}','{2}');" \
+                add_user_command = "INSERT INTO `users_tb` VALUES ('{0}','{1}','{2}');" \
                     .format(user.id_user, user.name_user, user.dep_user)
                 cursor.execute(add_user_command)
 
             connection.commit()
-            return ResponseDB(True, user)
+            return ResultData(True, "good")
     except Exception as e:
-        print(f"error: {e}")
-        return ResponseDB(False, e)
+        print(f"add_user: {e}")
+        return ResultData(False, e)
 
 
 # delete user from tb
@@ -63,14 +46,14 @@ def delete_user(id_user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                delete_user_command = f"DELETE FROM users_tb WHERE id_user = '{id_user}';"
+                delete_user_command = f"DELETE FROM `users_tb` WHERE `id_user` = '{id_user}';"
                 cursor.execute(delete_user_command)
 
             connection.commit()
-            return ResponseDB(True, "good")
+            return ResultData(True, "good")
     except Exception as e:
-        print(f"error: {e}")
-        return ResponseDB(False, e)
+        print(f"delete_user: {e}")
+        return ResultData(False, e)
 
 
 # return a user by his chat.id
@@ -78,16 +61,35 @@ def get_user(user_id):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                check_user_command = f"SELECT * FROM users_tb WHERE id_user = {user_id};"
+                check_user_command = f"SELECT * FROM `users_tb` WHERE `id_user` = '{user_id}';"
+
+                cursor.execute(check_user_command)
+                result = cursor.fetchall()[0]
+
+            connection.commit()
+            return ResultData(
+                User(result['id_user'], result['name_user'], result['dep_user']),
+                "good"
+            )
+    except Exception as e:
+        print(f"get_user: {e}")
+        return ResultData(None, f"error: {e}")
+
+
+def get_list_users():
+    try:
+        with connect_db() as connection:
+            with connection.cursor() as cursor:
+                check_user_command = f"SELECT * FROM `users_tb`;"
 
                 cursor.execute(check_user_command)
                 result = cursor.fetchall()
 
             connection.commit()
-            return result[0]
+            return ResultData(result, "good")
     except Exception as e:
-        print(f" user auth error: {e}")
-        return None
+        print(f"get_user: {e}")
+        return ResultData(None, f"error: {e}")
 
 
 class User:
@@ -97,11 +99,7 @@ class User:
         self.dep_user = dep_user
 
 
-class ResponseDB:
+class ResultData:
     def __init__(self, result, message):
         self.result = result
         self.message = message
-
-
-if __name__ == '__main__':
-    print(check_auth("886327182").result)
