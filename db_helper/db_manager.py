@@ -30,8 +30,8 @@ def add_user(user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                add_user_command = "INSERT INTO `users_tb` VALUES ('{0}','{1}','{2}');" \
-                    .format(user.id_user, user.name_user, user.dep_user)
+                add_user_command = "INSERT INTO `users` VALUES ('{0}','{1}','{2}', '{3}', '{4}');" \
+                    .format(user.id_user, user.name_user, user.dep_user, user.label_tech, user.label_creo)
                 cursor.execute(add_user_command)
 
             connection.commit()
@@ -46,7 +46,7 @@ def delete_user(id_user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                delete_user_command = f"DELETE FROM `users_tb` WHERE `id_user` = '{id_user}';"
+                delete_user_command = f"DELETE FROM `users` WHERE `id_user` = '{id_user}';"
                 cursor.execute(delete_user_command)
 
             connection.commit()
@@ -61,14 +61,20 @@ def get_user(user_id):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                check_user_command = f"SELECT * FROM `users_tb` WHERE `id_user` = '{user_id}';"
+                check_user_command = f"SELECT * FROM `users` WHERE `id_user` = '{user_id}';"
 
                 cursor.execute(check_user_command)
                 result = cursor.fetchall()[0]
 
             connection.commit()
             return ResultData(
-                User(result['id_user'], result['name_user'], result['dep_user']),
+                User(
+                    result['id_user'],
+                    result['name_user'],
+                    result['dep_user'],
+                    result['label_tech'],
+                    result['label_creo'],
+                ),
                 "good"
             )
     except Exception as e:
@@ -80,7 +86,7 @@ def get_list_users():
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                check_user_command = f"SELECT * FROM `users_tb`;"
+                check_user_command = f"SELECT * FROM `users`;"
 
                 cursor.execute(check_user_command)
                 result = cursor.fetchall()
@@ -93,10 +99,12 @@ def get_list_users():
 
 
 class User:
-    def __init__(self, id_user, name_user, dep_user):
+    def __init__(self, id_user, name_user, dep_user, label_tech, label_creo):
         self.name_user = name_user
         self.id_user = id_user
         self.dep_user = dep_user
+        self.label_tech = label_tech
+        self.label_creo = label_creo
 
 
 class ResultData:
