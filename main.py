@@ -1,7 +1,7 @@
 from telebot import types
 
 from config import DEBUG_MODE
-from db_helper.db_manager import add_user, User, delete_user, get_user, get_list_users
+from db_helper.db_manager import add_user, User, delete_user, get_user, get_list_users, add_card
 from bot_helper.menu_buttons import setStartButton, af_manager_menu, choice_offer_type
 from models.af_manager_model import model_offer, offer_step, set_offer_step, reset_offer
 from private_config import local_telegram_token, server_telegram_token
@@ -142,7 +142,7 @@ async def user_delete_add(message):
                 else:
                     unsuccessful += 1
             except Exception as e:
-                print(f"mailing all error for user {i}")
+                print(f"mailing all error for user {i}: {e}")
                 unsuccessful += 1
 
         await bot.reply_to(
@@ -223,20 +223,27 @@ async def offer_add(message):
                                 f"Гео: {model_offer['geo']}\n" \
                                 f"Отчисление по гео: {model_offer['reward_geo']}\n" \
                                 f"Промо ссылка: {model_offer['promo_link']}\n" \
-                                f"Связь в тг: @{message.chat.username}\n" \
+                                f"Связь в тг: @{message.chat.username}\n"
 
                     current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(model_offer['offer_name'], desc_card, "cards_tech").result
 
-                    create_card_tech(
-                        TrelloCard(
-                            name=f"{model_offer['operation']} ({model_offer['offer_name']})",
-                            desc=desc_card
-                        ),
-                        owner_dep=current_user.result.dep_user,
-                        owner_name=current_user.result.label_tech
-                    )
-
-                    await bot.send_message(message.chat.id, "Задание отправленно!")
+                    if result_add_to_db is not None:
+                        create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} {model_offer['operation']} ({model_offer['offer_name']})",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech
+                        )
+                        await bot.send_message(message.chat.id, "Задание отправленно!", reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            "Не вышло отправить задание",
+                            reply_markup=setStartButton()
+                        )
         else:
             await bot.reply_to(message, "Введите строку до 100 символов")
     else:
@@ -254,8 +261,32 @@ async def offer_edit(message):
                     await bot.send_message(message.chat.id, "Введите описание что сделать : ")
                 case 1:
                     set_state_none()  # reset user state
+
                     model_offer["desc_offer"] = message.text
-                    await bot.send_message(message.chat.id, "Задание отправленно!")
+
+                    desc_card = f"Id оффера в трекере : {model_offer['offer_id']}\n" \
+                                f"Задача : {model_offer['desc_offer']}\n\n" \
+                                f"Связь в тг: @{message.chat.username}\n"
+
+                    current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(model_offer['offer_id'], desc_card, "cards_tech").result
+
+                    if result_add_to_db is not None:
+                        create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} {model_offer['operation']} ({model_offer['offer_id']})",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech
+                        )
+                        await bot.send_message(message.chat.id, "Задание отправленно!", reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            "Не вышло отправить задание",
+                            reply_markup=setStartButton()
+                        )
         else:
             await bot.reply_to(message, "Введите строку до 100 символов")
     else:

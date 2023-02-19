@@ -94,7 +94,25 @@ def get_list_users():
             connection.commit()
             return ResultData(result, "good")
     except Exception as e:
-        print(f"get_user: {e}")
+        print(f"get_list_users: {e}")
+        return ResultData(None, f"error: {e}")
+
+
+def add_card(name, desc, tb_name):
+    try:
+        with connect_db() as connection:
+            with connection.cursor() as cursor:
+                card_add_command = f"INSERT INTO `{tb_name}` (`name`, `desc`) VALUES ('{name}', '{desc}');"
+                get_num_last_card = f"SELECT `id` FROM `{tb_name}`;"
+
+                cursor.execute(card_add_command)
+                cursor.execute(get_num_last_card)
+                result = cursor.fetchall()
+
+            connection.commit()
+            return ResultData(result[len(result)-1], "good")
+    except Exception as e:
+        print(f"add_card: {e}")
         return ResultData(None, f"error: {e}")
 
 
