@@ -1,14 +1,18 @@
+import datetime
+
 from telebot import types
 
 from config import DEBUG_MODE
 from db_helper.db_manager import add_user, User, delete_user, get_user, get_list_users, add_card
-from bot_helper.menu_buttons import setStartButton, af_manager_menu, choice_offer_type
+from bot_helper.menu_buttons import setStartButton, af_manager_menu, choice_offer_type, media_menu, \
+    choice_media_type_date
 from models.af_manager_model import model_offer, offer_step, set_offer_step, reset_offer
+from models.media_manager_model import reset_media, set_media_step, media_step, model_media
 from private_config import local_telegram_token, server_telegram_token
 from telebot.async_telebot import AsyncTeleBot
 import asyncio
 
-from trello_helper.trello_manager import create_card_tech, TrelloCard, create_label
+from trello_helper.trello_manager import create_card_tech, TrelloCard, create_label, create_card_creo
 
 # bot settings
 if DEBUG_MODE:
@@ -25,12 +29,14 @@ modes = {
 
     "add_offer",
     "edit_offer"
+
+    "order_creative"
 }
 
 user_state = "none"
 
 # dep states
-dep_states = {"admin", "gamble_ppc", "gamble_uac", "gamble_fb", "af_manager", "the_PR"}
+dep_states = {"admin", "gamble_ppc", "gamble_uac", "gamble_fb", "af_manager", "media"}
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
@@ -128,7 +134,7 @@ async def user_delete_add(message):
 
 
 @bot.message_handler(func=lambda m: user_state == "mailing_all")
-async def user_delete_add(message):
+async def user_mailing(message):
     set_state_none()  # reset user state
 
     if get_user(message.chat.id).result is not None:
@@ -154,7 +160,8 @@ async def user_delete_add(message):
         await bot.send_message(message.chat.id, 'Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: m.text in ("Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Schema"))
+@bot.message_handler(
+    func=lambda m: m.text in ("Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Schema", "Media"))
 async def choice_category(message):
     set_state_none()  # reset user state
 
@@ -162,6 +169,8 @@ async def choice_category(message):
         match message.text:
             case "AF Manager":
                 await bot.send_message(message.chat.id, message.text + ": ", reply_markup=af_manager_menu())
+            case "Media":
+                await bot.send_message(message.chat.id, message.text + ": ", reply_markup=media_menu())
             case _:
                 await bot.reply_to(message, "(В разработке)")
     else:
@@ -293,6 +302,127 @@ async def offer_edit(message):
         await bot.send_message(message.chat.id, 'Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
 
 
+@bot.message_handler(func=lambda m: user_state == "order_creative")
+async def order_creo(message):
+    if get_user(message.chat.id).result is not None:
+        if len(message.text) < 100:
+            match media_step["step"]:
+                case 0:
+                    model_media["currency_type"] = message.text
+                    set_media_step(1)
+                    await bot.send_message(message.chat.id, "Введите гео : ")
+                case 1:
+                    model_media["geo"] = message.text
+                    set_media_step(2)
+                    await bot.send_message(message.chat.id, "Введите тайминг видео (в секундах) : ")
+                case 2:
+                    model_media["timing_video"] = message.text
+                    set_media_step(3)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Формат креатива: размер (например 1000х1000 пикселей) ,"
+                        " формат файла (например mp4), необходимый размер файла (например до 10 мб):"
+                    )
+                case 3:
+                    model_media["format"] = message.text
+                    set_media_step(4)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Вложения для ТЗ: ссылки на картинки/видео и объяснение! Брать ли исходники"
+                        " на усмотрение креативщика либо опишите как именно использовать референсы в креативе."
+                    )
+                case 4:
+                    model_media["source"] = message.text
+                    set_media_step(5)
+                    await bot.send_message(message.chat.id, "Введите количество креативов : ")
+                case 5:
+                    model_media["count"] = message.text
+                    set_media_step(6)
+                    await bot.send_message(message.chat.id, "Введите оффер : ")
+                case 6:
+                    model_media["offer"] = message.text
+                    set_media_step(7)
+                    await bot.send_message(message.chat.id, "Введите описание : ")
+                case 7:
+                    model_media["desc"] = message.text
+                    set_media_step(8)
+                    await bot.send_message(message.chat.id, "Введите краткое название для карты : ")
+                case 8:
+                    if len(message.text) <= 40:
+                        model_media["title"] = message.text
+                        set_media_step(9)
+                        await bot.send_message(
+                            message.chat.id,
+                            "Введите дедлайн задачи в формате\n"
+                            "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                            reply_markup=choice_media_type_date()
+                        )
+                    else:
+                        await bot.reply_to(message, "Краткое название должно быть до 40 символов : ")
+                case 9:
+                    try:
+                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                            dateTime = datetime.datetime.strptime(
+                                datetime.datetime.now().strftime("%Y-%m-%d") +
+                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
+                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                            dateTime = datetime.datetime.strptime(
+                                datetime.datetime.now().strftime("%Y-%m-%d") +
+                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                       + datetime.timedelta(days=1)
+                        elif message.text == "Пропустить":
+                            dateTime = ""
+                        else:
+                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+
+                        desc_card = f"Валюта : {model_media['currency_type']}\n" \
+                                    f"Гео : {model_media['geo']}\n" \
+                                    f"Тайминг видео : {model_media['timing_video']}\n" \
+                                    f"Формат креатива : {model_media['format']}\n" \
+                                    f"Количество креативов : {model_media['count']}\n" \
+                                    f"Оффер : {model_media['offer']}\n\n" \
+                                    f"Вложения для ТЗ : \n{model_media['source']}\n\n" \
+                                    f"Описание доп : \n{model_media['desc']}\n\n" \
+                                    f"Связь в тг: @{message.chat.username}\n"
+
+                        current_user = get_user(message.chat.id)
+                        result_add_to_db = add_card(model_media['title'], desc_card, "cards_creo").result
+
+                        if result_add_to_db is not None:
+                            create_card_creo(
+                                TrelloCard(
+                                    name=f"#{result_add_to_db['id']} Заказать Креатив ({model_media['title']})",
+                                    desc=desc_card
+                                ),
+                                owner_dep=current_user.result.dep_user,
+                                owner_name=current_user.result.label_creo,
+                                date=dateTime
+                            )
+                            await bot.send_message(message.chat.id, "Задание отправленно!",
+                                                   reply_markup=setStartButton())
+
+                            set_state_none()  # reset user state
+                        else:
+                            await bot.send_message(
+                                message.chat.id,
+                                "Не вышло отправить задание",
+                                reply_markup=setStartButton()
+                            )
+                            set_state_none()  # reset user state
+
+                    except Exception as e:
+                        print(e)
+                        await bot.reply_to(
+                            message,
+                            "Неправильный формат, введите в формате\n"
+                            "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                        )
+        else:
+            await bot.reply_to(message, "Введите строку до 100 символов")
+    else:
+        await bot.send_message(message.chat.id, 'Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 async def answer(call):
     global user_state
@@ -319,6 +449,16 @@ async def answer(call):
                     call.from_user.id,
                     "Новый рекламодатель или существующий?",
                     reply_markup=choice_offer_type()
+                )
+            case "order_creative":
+                user_state = "order_creative"
+                reset_media()
+                set_media_step(0)
+
+                await bot.send_message(
+                    call.from_user.id,
+                    "Язык, валюта: (например: CAD/или символ валюты) : ",
+                    reply_markup=close_markup
                 )
     else:
         await bot.send_message(call.from_user.id, 'Вы не зарегестрированы, напишите админу', reply_markup=close_markup)

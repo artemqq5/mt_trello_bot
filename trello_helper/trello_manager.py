@@ -85,7 +85,24 @@ def create_card_tech(card, owner_dep, owner_name):
         'idList': idList_tech,
         'name': card.name,
         'desc': card.desc,
-        'idLabels': [owner_name, card_labels_tech[owner_dep]]
+        'idLabels': [card_labels_tech[owner_dep], owner_name, ]
+    }
+
+    requests.request(
+        "POST",
+        url=urlCard,
+        headers={"Accept": "application/json"},
+        params=query | default_key_dict
+    )
+
+
+def create_card_creo(card, owner_dep, owner_name, date):
+    query = {
+        'idList': idList_creo,
+        'name': card.name,
+        'desc': card.desc,
+        'idLabels': [card_labels_creo[owner_dep], owner_name, ],
+        'due': date
     }
 
     requests.request(
