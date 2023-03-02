@@ -7,12 +7,12 @@ def setStartButton():
     markup = types.ReplyKeyboardMarkup()
 
     listButtons = (
-        # types.KeyboardButton('Gambling FB (В разработке)'),
-        # types.KeyboardButton('Gambling PPC (В разработке)'),
-        # types.KeyboardButton('Gambling UAC (В разработке)'),
+        types.KeyboardButton('Мои Задания 📋'),
+        types.KeyboardButton('Gambling FB'),
+        types.KeyboardButton('Gambling PPC'),
+        types.KeyboardButton('Gambling UAC'),
         types.KeyboardButton('AF Manager'),
         types.KeyboardButton('Media'),
-        # types.KeyboardButton('Schema (В разработке)'),
     )
 
     for i in listButtons:
@@ -21,43 +21,29 @@ def setStartButton():
     return markup
 
 
-# =================AF Manager====================
-def af_manager_menu():
+def my_tasks_menu():
     markup = types.InlineKeyboardMarkup()
 
-    listButtons = (
-        types.InlineKeyboardButton('Редактировать оффер', callback_data="edit_offer"),
-        types.InlineKeyboardButton('Добавить оффер', callback_data="add_offer"),
+    markup.row(
+        types.InlineKeyboardButton('tech', callback_data="my_task_tech"),
+        types.InlineKeyboardButton('creo', callback_data="my_task_creo")
     )
 
-    for i in listButtons:
-        markup.add(i)
-
     return markup
 
 
-def choice_offer_type():
-    markup = types.ReplyKeyboardMarkup()
-
-    markup.add(types.KeyboardButton('Новый'))
-    markup.add(types.KeyboardButton('Существующий'))
-
-    return markup
-
-
-# ==================AF Manager end===================
-
-
-# ===============Media======================
-def media_menu():
+def manage_card():
     markup = types.InlineKeyboardMarkup()
 
-    markup.add(types.InlineKeyboardButton('Заказать Креатив', callback_data="order_creative"))
+    markup.row(
+        types.InlineKeyboardButton('Удалить задание', callback_data="delete_card"),
+        types.InlineKeyboardButton('Написать комментарий', callback_data="commend_card")
+    )
 
     return markup
 
 
-def choice_media_type_date():
+def choice_date():
     markup = types.ReplyKeyboardMarkup()
 
     markup.add(types.KeyboardButton('Пропустить'))
@@ -74,4 +60,7 @@ def choice_media_type_date():
     )
 
     return markup
-# ===============Media end======================
+
+
+def skip_desc():
+    return types.ReplyKeyboardMarkup().add(types.KeyboardButton('Пропустить'))
