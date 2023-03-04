@@ -6,6 +6,9 @@ model_task_list = {}
 # step (0-title, 1-desc, 2-time) custom task
 # step (0-geo, 1-name, 2-desc, 3-time) pwa
 # step (0-geo, 1-offer) create campaign
+# step (0-names, 1-desc, 2-time) set domain
+# step (0-geo, 1-offer, 2-domains, 3-desc, 4-time) setting cloak
+# step (0-geo, 1-source, 2-link_tt, 3-desc, 4-time) prepare vait
 
 task_step = {"step": 0, }
 

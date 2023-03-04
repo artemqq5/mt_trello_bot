@@ -40,6 +40,10 @@ modes = {
     "create_campaign",
 
     "add_comment",
+
+    "set_domain",
+    "setting_cloak",
+    "prepare_vait",
 }
 
 user_state = "none"
@@ -757,9 +761,261 @@ async def create_campaign(message):
         await bot.send_message(message.chat.id, '⛔ Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
 
 
+@bot.message_handler(func=lambda m: user_state == "set_domain")
+async def set_domain(message):
+    if get_user(message.chat.id).result is not None:
+        match task_step["step"]:
+            case 0:
+                model_task_list['offer_names'] = message.text
+                set_task_step(1)
+                await bot.send_message(message.chat.id, "Введите описание : ")
+
+            case 1:
+                model_task_list['desc'] = message.text
+                set_task_step(2)
+                await bot.send_message(
+                    message.chat.id,
+                    "Введите дедлайн задачи в формате\n"
+                    "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                    reply_markup=choice_date()
+                )
+
+            case 2:
+                try:
+                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
+                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                   + datetime.timedelta(days=1)
+                    elif message.text == "Пропустить":
+                        dateTime = ""
+                    else:
+                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+
+                    desc_card = f"Названия доменов : {model_task_list['offer_names']}\n\n" \
+                                f"Описание : {model_task_list['desc']}\n\n" \
+                                f"Связь в тг: @{message.chat.username}\n"
+
+                    current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(
+                        f"Припарковать домен {current_user.result.name_user}",
+                        model_task_list['desc'],
+                        "cards_tech"
+                    ).result
+
+                    if result_add_to_db is not None:
+                        create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} Припарковать домен",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech,
+                            date=dateTime
+                        )
+                        await bot.send_message(message.chat.id, "✅ Задание отправленно!",
+                                               reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            "Не вышло отправить задание",
+                            reply_markup=setStartButton()
+                        )
+
+                    set_state_none()  # reset user state
+                except Exception as e:
+                    print(e)
+                    await bot.reply_to(
+                        message,
+                        "Неправильный формат, введите в формате\n"
+                        "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                    )
+
+    else:
+        await bot.send_message(message.chat.id, '⛔ Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
+
+
+@bot.message_handler(func=lambda m: user_state == "setting_cloak")
+async def setting_cloak(message):
+    if get_user(message.chat.id).result is not None:
+        match task_step["step"]:
+            case 0:
+                model_task_list['geo'] = message.text
+                set_task_step(1)
+                await bot.send_message(message.chat.id, "Введите оффер : ")
+            case 1:
+                model_task_list['offer'] = message.text
+                set_task_step(2)
+                await bot.send_message(message.chat.id, "Введите домены : ")
+            case 2:
+                model_task_list['domains'] = message.text
+                set_task_step(3)
+                await bot.send_message(message.chat.id, "Введите описание : ")
+            case 3:
+                model_task_list['desc'] = message.text
+                set_task_step(4)
+                await bot.send_message(
+                    message.chat.id,
+                    "Введите дедлайн задачи в формате\n"
+                    "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                    reply_markup=choice_date()
+                )
+
+            case 4:
+                try:
+                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
+                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                   + datetime.timedelta(days=1)
+                    elif message.text == "Пропустить":
+                        dateTime = ""
+                    else:
+                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+
+                    desc_card = f"Гео : {model_task_list['geo']}\n\n" \
+                                f"Оффер : {model_task_list['offer']}\n\n" \
+                                f"Домены : \n{model_task_list['domains']}\n\n" \
+                                f"Описание : {model_task_list['desc']}\n\n" \
+                                f"Связь в тг: @{message.chat.username}\n"
+
+                    current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(
+                        f"Настроить клоаку {current_user.result.name_user}",
+                        model_task_list['desc'],
+                        "cards_tech"
+                    ).result
+
+                    if result_add_to_db is not None:
+                        create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} Настроить клоаку",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech,
+                            date=dateTime
+                        )
+                        await bot.send_message(message.chat.id, "✅ Задание отправленно!",
+                                               reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            "Не вышло отправить задание",
+                            reply_markup=setStartButton()
+                        )
+
+                    set_state_none()  # reset user state
+                except Exception as e:
+                    print(e)
+                    await bot.reply_to(
+                        message,
+                        "Неправильный формат, введите в формате\n"
+                        "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                    )
+
+    else:
+        await bot.send_message(message.chat.id, '⛔ Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
+
+
+@bot.message_handler(func=lambda m: user_state == "prepare_vait")
+async def prepare_vait(message):
+    if get_user(message.chat.id).result is not None:
+        match task_step["step"]:
+            case 0:
+                model_task_list['geo'] = message.text
+                set_task_step(1)
+                await bot.send_message(message.chat.id, "Введите исходники : ")
+            case 1:
+                model_task_list['source'] = message.text
+                set_task_step(2)
+                await bot.send_message(message.chat.id, "Введите ТЗ / ссылку на ТЗ : ")
+            case 2:
+                model_task_list['link_tt'] = message.text
+                set_task_step(3)
+                await bot.send_message(message.chat.id, "Введите описание : ")
+            case 3:
+                model_task_list['desc'] = message.text
+                set_task_step(4)
+                await bot.send_message(
+                    message.chat.id,
+                    "Введите дедлайн задачи в формате\n"
+                    "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                    reply_markup=choice_date()
+                )
+
+            case 4:
+                try:
+                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
+                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                   + datetime.timedelta(days=1)
+                    elif message.text == "Пропустить":
+                        dateTime = ""
+                    else:
+                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+
+                    desc_card = f"Гео : {model_task_list['geo']}\n" \
+                                f"Исходники : {model_task_list['source']}\n\n" \
+                                f"ТЗ : \n{model_task_list['link_tt']}\n\n" \
+                                f"Описание : {model_task_list['desc']}\n\n" \
+                                f"Связь в тг: @{message.chat.username}\n"
+
+                    current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(
+                        f"Подготовить вайт {current_user.result.name_user}",
+                        model_task_list['desc'],
+                        "cards_tech"
+                    ).result
+
+                    if result_add_to_db is not None:
+                        create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} Подготовить вайт",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech,
+                            date=dateTime
+                        )
+                        await bot.send_message(message.chat.id, "✅ Задание отправленно!",
+                                               reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            "Не вышло отправить задание",
+                            reply_markup=setStartButton()
+                        )
+
+                    set_state_none()  # reset user state
+                except Exception as e:
+                    print(e)
+                    await bot.reply_to(
+                        message,
+                        "Неправильный формат, введите в формате\n"
+                        "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                    )
+
+    else:
+        await bot.send_message(message.chat.id, '⛔ Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
+
+
 @bot.callback_query_handler(func=lambda call: call.data in (
         "edit_offer", "add_offer", "order_creative", "share_app", "other_task",
-        "pwa_app", "create_campaign", "my_task_creo", "my_task_tech"))
+        "pwa_app", "create_campaign", "set_domain", "setting_cloak", "prepare_vait", "my_task_creo", "my_task_tech"))
 async def answer(call):
     global user_state
     set_state_none()  # reset user state
@@ -820,6 +1076,30 @@ async def answer(call):
                 )
             case "create_campaign":
                 user_state = "create_campaign"
+
+                await bot.send_message(
+                    call.from_user.id,
+                    "Гео : ",
+                    reply_markup=close_markup
+                )
+            case "set_domain":
+                user_state = "set_domain"
+
+                await bot.send_message(
+                    call.from_user.id,
+                    "Введите названия доменов : ",
+                    reply_markup=close_markup
+                )
+            case "setting_cloak":
+                user_state = "setting_cloak"
+
+                await bot.send_message(
+                    call.from_user.id,
+                    "Гео : ",
+                    reply_markup=close_markup
+                )
+            case "prepare_vait":
+                user_state = "prepare_vait"
 
                 await bot.send_message(
                     call.from_user.id,
