@@ -254,8 +254,8 @@ async def offer_add(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Добавить {model_task_list['type']} оффер {current_user.result.name_user}",
-                        model_task_list['offer_name'],
+                        f"Add offer by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -302,8 +302,8 @@ async def offer_edit(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Редактировать оффер {current_user.result.name_user}",
-                        model_task_list['offer_id'],
+                        f"Edit offer by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -417,8 +417,8 @@ async def order_creo(message):
 
                         current_user = get_user(message.chat.id)
                         result_add_to_db = add_card(
-                            f"Заказать Креатив {current_user.result.name_user}",
-                            model_task_list['title'],
+                            f"Order Creative by ({current_user.result.name_user})",
+                            f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_creo"
                         ).result
 
@@ -504,8 +504,8 @@ async def share_app(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Расшарить прилу {current_user.result.name_user}",
-                        model_task_list['desc'],
+                        f"Share app by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -570,8 +570,8 @@ async def other_task(message):
 
                         current_user = get_user(message.chat.id)
                         result_add_to_db = add_card(
-                            f"custom_task {current_user.result.name_user}",
-                            model_task_list['title'],
+                            f"custom_task by ({current_user.result.name_user})",
+                            f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_tech"
                         ).result
 
@@ -653,8 +653,8 @@ async def pwa_(message):
 
                         current_user = get_user(message.chat.id)
                         result_add_to_db = add_card(
-                            f"PWA {current_user.result.name_user}",
-                            model_task_list['desc'],
+                            f"PWA by ({current_user.result.name_user})",
+                            f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_tech"
                         ).result
 
@@ -733,8 +733,8 @@ async def create_campaign(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Создать кампанию {current_user.result.name_user}",
-                        model_task_list['offer_name'],
+                        f"Create campaign by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -804,8 +804,8 @@ async def set_domain(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Припарковать домен {current_user.result.name_user}",
-                        model_task_list['desc'],
+                        f"Park domain by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -891,8 +891,8 @@ async def setting_cloak(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Настроить клоаку {current_user.result.name_user}",
-                        model_task_list['desc'],
+                        f"Setting cloak by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
@@ -978,8 +978,8 @@ async def prepare_vait(message):
 
                     current_user = get_user(message.chat.id)
                     result_add_to_db = add_card(
-                        f"Подготовить вайт {current_user.result.name_user}",
-                        model_task_list['desc'],
+                        f"Prepare vait by ({current_user.result.name_user})",
+                        f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech"
                     ).result
 
