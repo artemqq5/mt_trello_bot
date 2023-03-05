@@ -19,31 +19,51 @@ if DEBUG_MODE:
     idList_tech = "63dee8451b098dbb297364d5"
     idList_creo = "63f13834e8cccb4aadd9df57"
     # cards label
-    admin_card_dep_tech = "63f11b61964c04a585f18843"
-    admin_card_dep_creo = "63f13a1d58e626baa8577a1b"
+    card_labels_tech = {
+        'admin': "63f11b61964c04a585f18843",
+        'gambleppc': "6404850165d7ef9e460e4ff5",
+        'gambleuac': "640484f407dd03c70ac1e6e4",
+        'gamblefb': "640484eb648168166b969afc",
+        'afmngr': "640484db11324cef2b6b24d2",
+        'media': "640484d2b0f7e9d9e06e4617",
+    }
+    card_labels_creo = {
+        'admin': "63f13a1d58e626baa8577a1b",
+        'gambleppc': "6404843d6537b1e009267ff9",
+        'gambleuac': "6404844caf2ec97c635166cb",
+        'gamblefb': "64048456b3fa400da1d5e145",
+        'afmngr': "6404846d85bbd09e92d1f715",
+        'media': "64048477f9e3e14232c3430b",
+    }
 else:
     API_KEY_TRELLO = server_api_key_trello
     TOKEN_TRELLO = server_token_trello
     API_SECRET_TRELLO = server_secret_trello
-    # нужно взять аккаунт !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    idBoard_tech = ""
-    idBoard_creo = ""
-    idList_tech = ""
-    idList_creo = ""
+    #####
+    idBoard_tech = "63453d2e8f5c5c00831d85e7"
+    idBoard_creo = "633c5216d400ad00dfdc62c4"
+    idList_tech = "63454557e3731b04b58bf1b0"
+    idList_creo = "633c563d00d9d7030833c807"
     # cards label
-    admin_card_dep_tech = ""
-    admin_card_dep_creo = ""
+    card_labels_tech = {
+        'admin': "634eba07598e200171c9c440",
+        'gambleppc': "637cd15bc7f02600b406622a",
+        'gambleuac': "635e88d84e89fc02a1fed322",
+        'gamblefb': "635cfb6e71b54701df49070c",
+        'afmngr': "63ab08faaf2cb403e4f5516b",
+        'media': "6404832e79e458c4683a9c77",
+    }
+    card_labels_creo = {
+        'admin': "63886c84a055ba018fd0f714",
+        'gambleppc': "64048133310cdfcb6037f91e",
+        'gambleuac': "63b7f64fbaad5d00c2a14fb2",
+        'gamblefb': "63d12587d8379f44194d4501",
+        'afmngr': "6404835b966d3b4c25e92a5b",
+        'media': "640480f372fb31ec890d8631",
+    }
 
 # dict for every request
 default_key_dict = {'key': API_KEY_TRELLO, 'token': TOKEN_TRELLO}
-
-# dict labels to card
-card_labels_tech = {
-    'admin': admin_card_dep_tech
-}
-card_labels_creo = {
-    'admin': admin_card_dep_creo
-}
 
 # url for working with cards
 urlCard = "https://api.trello.com/1/cards"
@@ -135,13 +155,15 @@ def add_attachments_to_card(card_id, source):
 # get all tasks
 def get_tasks(typeListId, userlabel):
     tasks_l = clientTrelloApi.get_list(typeListId).list_cards()
-    if len(tasks_l) == 0:
+    markup = types.InlineKeyboardMarkup()
+    for card in tasks_l:
+        for label in card.idLabels:
+            if str(label) == userlabel:
+                markup.add(types.InlineKeyboardButton(card.name, callback_data=f"card_{card.id}"))
+
+    if len(markup.to_dict()['inline_keyboard']) == 0:
         return TaskResult("У вас нет активных заданий")
     else:
-        markup = types.InlineKeyboardMarkup()
-        for card in tasks_l:
-            markup.add(types.InlineKeyboardButton(card.name, callback_data=f"card_{card.id}"))
-
         return TaskResult("Успешно", markup)
 
 
@@ -159,10 +181,9 @@ def get_card(id_card):
 
 
 def delete_card(id_card):
-
     return requests.request(
         "DELETE",
-        url=urlCard+f"/{id_card}",
+        url=urlCard + f"/{id_card}",
         headers={"Accept": "application/json"},
         params=default_key_dict
     ).ok

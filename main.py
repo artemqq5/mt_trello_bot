@@ -1,22 +1,19 @@
 import datetime
 from telebot import types
 
-from bot_helper.af_manager_buttons import af_manager_menu, choice_offer_type
-from bot_helper.gambling_fb_buttons import gambling_fb_menu
-from bot_helper.gambling_ppc_buttons import gambling_ppc_menu
-from bot_helper.gambling_uac_buttons import gambling_uac_menu
-from bot_helper.media_buttons import media_menu
-from config import DEBUG_MODE
-from db_helper.db_manager import add_user, User, delete_user, get_user, get_list_users, add_card
-from bot_helper.menu_buttons import setStartButton, choice_date, skip_desc, my_tasks_menu, manage_card
+from bot_helper.af_manager_buttons import *
+from bot_helper.gambling_fb_buttons import *
+from bot_helper.gambling_ppc_buttons import *
+from bot_helper.gambling_uac_buttons import *
+from bot_helper.media_buttons import *
+from db_helper.db_manager import *
+from bot_helper.menu_buttons import *
 from models.task_form import *
 from private_config import local_telegram_token, server_telegram_token
 from telebot.async_telebot import AsyncTeleBot
 import asyncio
 
-from trello_helper.trello_manager import create_card_tech, TrelloCard, create_label, create_card_creo, \
-    add_attachments_to_card, get_tasks, idList_creo, get_callback_cards, get_card, idList_tech, delete_card, \
-    write_comment
+from trello_helper.trello_manager import *
 
 # bot settings
 if DEBUG_MODE:
@@ -49,7 +46,7 @@ modes = {
 user_state = "none"
 
 # dep states
-dep_states = {"admin", "gamble_ppc", "gamble_uac", "gamble_fb", "af_manager", "media"}
+dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media"}
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
@@ -436,10 +433,12 @@ async def order_creo(message):
                                 date=dateTime
                             )
 
-                            result = add_attachments_to_card(card_id=card_id.json()['id'],
-                                                             source=model_task_list['source'])
+                            add_attachments_to_card(
+                                card_id=card_id.json()['id'],
+                                source=model_task_list['source']
+                            )
 
-                            if card_id.ok and result:
+                            if card_id.ok:
                                 await bot.send_message(
                                     message.chat.id,
                                     "✅ Задание отправленно!",
@@ -463,11 +462,14 @@ async def order_creo(message):
 
                     except Exception as e:
                         print(e)
-                        await bot.reply_to(
-                            message,
-                            "Неправильный формат, введите в формате\n"
-                            "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
-                        )
+                        if str(e).__contains__("does not match format '%Y-%m-%d %H:%M %z'"):
+                            await bot.reply_to(
+                                message,
+                                "Неправильный формат, введите в формате\n"
+                                "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                            )
+                        else:
+                            set_state_none()  # reset user state
         else:
             await bot.reply_to(message, "Введите строку до 100 символов")
     else:
@@ -1027,85 +1029,143 @@ async def answer(call):
     if current_user is not None:
         match call.data:
             case "edit_offer":
-                user_state = "edit_offer"
-
-                await bot.send_message(
-                    call.from_user.id,
-                    "Id оффера в трекере : ",
-                    reply_markup=close_markup
-                )
+                if current_user.dep_user in ("afmngr", "admin"):
+                    user_state = "edit_offer"
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Id оффера в трекере : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "add_offer":
-                user_state = "add_offer"
-
-                await bot.send_message(
-                    call.from_user.id,
-                    "Новый рекламодатель или существующий?",
-                    reply_markup=choice_offer_type()
-                )
+                if current_user.dep_user in ("afmngr", "admin"):
+                    user_state = "add_offer"
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Новый рекламодатель или существующий?",
+                        reply_markup=choice_offer_type()
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "order_creative":
-                user_state = "order_creative"
+                if current_user.dep_user != "afmngr":
+                    user_state = "order_creative"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Язык, валюта: (например: CAD/или символ валюты) : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Язык, валюта: (например: CAD/или символ валюты) : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "share_app":
-                user_state = "share_app"
+                if current_user.dep_user in ("gamblefb", "gambleuac", "admin"):
+                    user_state = "share_app"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Введите название приложения : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Введите название приложения : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "other_task":
-                user_state = "other_task"
+                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin"):
+                    user_state = "other_task"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Введите краткое название задачи : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Введите краткое название задачи : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "pwa_app":
-                user_state = "pwa_app"
+                if current_user.dep_user in ("gamblefb", "gambleuac", "admin"):
+                    user_state = "pwa_app"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Гео : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Гео : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "create_campaign":
-                user_state = "create_campaign"
+                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin"):
+                    user_state = "create_campaign"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Гео : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Гео : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "set_domain":
-                user_state = "set_domain"
+                if current_user.dep_user in ("gambleppc", "admin"):
+                    user_state = "set_domain"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Введите названия доменов : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Введите названия доменов : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "setting_cloak":
-                user_state = "setting_cloak"
+                if current_user.dep_user in ("gambleppc", "admin"):
+                    user_state = "setting_cloak"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Гео : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Гео : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "prepare_vait":
-                user_state = "prepare_vait"
+                if current_user.dep_user in ("gambleppc", "admin"):
+                    user_state = "prepare_vait"
 
-                await bot.send_message(
-                    call.from_user.id,
-                    "Гео : ",
-                    reply_markup=close_markup
-                )
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Гео : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
             case "my_task_creo":
                 creo_tasks = get_tasks(typeListId=idList_creo, userlabel=current_user.label_creo)
                 if creo_tasks.markup is None:
