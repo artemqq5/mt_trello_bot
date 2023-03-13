@@ -1,5 +1,6 @@
 import datetime
 from telebot import types
+from telebot.types import BotCommand
 
 from bot_helper.af_manager_buttons import *
 from bot_helper.gambling_fb_buttons import *
@@ -62,6 +63,13 @@ def set_state_none():
 @bot.message_handler(commands=['start'])
 async def start_message(message):
     set_state_none()  # reset user state
+
+    # await bot.set_my_commands(
+    #     commands=[
+    #         BotCommand("/start", "Меню"),
+    #         BotCommand("/add_user", "Добавить пользователя"),
+    #         BotCommand("/delete_user", "Удалить пользователя"),
+    #         BotCommand("/mailing_all", "Рассылка всем")])
 
     if get_user(message.chat.id).result is not None:
         await bot.send_message(message.chat.id, 'Меню', reply_markup=setStartButton())
