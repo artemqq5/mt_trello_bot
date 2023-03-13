@@ -1,5 +1,6 @@
 import datetime
 from telebot import types
+from telebot.types import BotCommand
 
 from bot_helper.af_manager_buttons import *
 from bot_helper.gambling_fb_buttons import *
@@ -62,6 +63,13 @@ def set_state_none():
 @bot.message_handler(commands=['start'])
 async def start_message(message):
     set_state_none()  # reset user state
+
+    # await bot.set_my_commands(
+    #     commands=[
+    #         BotCommand("/start", "Меню"),
+    #         BotCommand("/add_user", "Добавить пользователя"),
+    #         BotCommand("/delete_user", "Удалить пользователя"),
+    #         BotCommand("/mailing_all", "Рассылка всем")])
 
     if get_user(message.chat.id).result is not None:
         await bot.send_message(message.chat.id, 'Меню', reply_markup=setStartButton())
@@ -723,12 +731,12 @@ async def create_campaign(message):
                 case 0:
                     model_task_list['geo'] = message.text
                     set_task_step(1)
-                    await bot.send_message(message.chat.id, "Введите оффер : ")
+                    await bot.send_message(message.chat.id, "Введите прилу : ")
                 case 1:
-                    model_task_list['offer_name'] = message.text
+                    model_task_list['app_name'] = message.text
 
                     desc_card = f"Гео : {model_task_list['geo']}\n" \
-                                f"Оффер : {model_task_list['offer_name']}\n\n" \
+                                f"Приложение : {model_task_list['app_name']}\n\n" \
                                 f"Связь в тг : @{message.chat.username}\n"
 
                     current_user = get_user(message.chat.id)
@@ -741,7 +749,7 @@ async def create_campaign(message):
                     if result_add_to_db is not None:
                         create_card_tech(
                             TrelloCard(
-                                name=f"#{result_add_to_db['id']} Создать кампанию ({model_task_list['offer_name']})",
+                                name=f"#{result_add_to_db['id']} Создать кампанию ({model_task_list['app_name']})",
                                 desc=desc_card
                             ),
                             owner_dep=current_user.result.dep_user,
