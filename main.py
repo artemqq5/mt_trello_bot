@@ -33,6 +33,7 @@ modes = {
     "edit_offer",
 
     "order_creative",
+    "order_creative_gamble",
     "share_app",
     "pwa_app",
     "create_campaign",
@@ -433,7 +434,7 @@ async def order_creo(message):
                         if result_add_to_db is not None:
                             card_id = create_card_creo(
                                 TrelloCard(
-                                    name=f"#{result_add_to_db['id']} Заказать Креатив ({model_task_list['title']})",
+                                    name=f"#{result_add_to_db['id']} Креатив ({model_task_list['title']})",
                                     desc=desc_card
                                 ),
                                 owner_dep=current_user.result.dep_user,
@@ -444,6 +445,248 @@ async def order_creo(message):
                             add_attachments_to_card(
                                 card_id=card_id.json()['id'],
                                 source=model_task_list['source']
+                            )
+
+                            if card_id.ok:
+                                await bot.send_message(
+                                    message.chat.id,
+                                    "✅ Задание отправленно!",
+                                    reply_markup=setStartButton()
+                                )
+                            else:
+                                await bot.send_message(
+                                    message.chat.id,
+                                    "Не вышло отправить задание",
+                                    reply_markup=setStartButton()
+                                )
+
+                            set_state_none()  # reset user state
+                        else:
+                            await bot.send_message(
+                                message.chat.id,
+                                "Не вышло отправить задание",
+                                reply_markup=setStartButton()
+                            )
+                            set_state_none()  # reset user state
+
+                    except Exception as e:
+                        print(e)
+                        if str(e).__contains__("does not match format '%Y-%m-%d %H:%M %z'"):
+                            await bot.reply_to(
+                                message,
+                                "Неправильный формат, введите в формате\n"
+                                "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00"
+                            )
+                        else:
+                            set_state_none()  # reset user state
+        else:
+            await bot.reply_to(message, "Введите строку до 100 символов")
+    else:
+        await bot.send_message(message.chat.id, '⛔ Вы не зарегестрированы, напишите админу', reply_markup=close_markup)
+
+
+@bot.message_handler(func=lambda m: user_state == "order_creative_gamble")
+async def order_creo_gamble(message):
+    if get_user(message.chat.id).result is not None:
+        if len(message.text) < 100 or task_step["step"] in (3, 4, 12, 13, 14):
+            match task_step["step"]:
+                case 0:
+                    try:
+                        model_task_list["count"] = int(message.text)
+                        set_task_step(1)
+                        await bot.send_message(message.chat.id, "Введите гео : ")
+                    except Exception as e:
+                        print(f"order gambling creo (input count of creo) {e}")
+                        await bot.send_message(message.chat.id, "Введите число : ")
+                case 1:
+                    model_task_list["geo"] = message.text
+                    set_task_step(2)
+                    await bot.send_message(message.chat.id, "Язык, валюта: (например: CAD/или символ валюты) : ")
+                case 2:
+                    model_task_list["valuta"] = message.text
+                    set_task_step(3)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Формат креатива: размер (например 1000х1000 пикселей) ,"
+                        " формат файла (например mp4), необходимый размер файла (например до 10 мб):"
+                    )
+                case 3:
+                    model_task_list["format"] = message.text
+                    set_task_step(4)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Введите оффер (бонусы, текст и тд): ",
+                        reply_markup=skip_desc()
+                    )
+                case 4:
+                    if message.text == "Пропустить":
+                        model_task_list["offer"] = "Установи и выиграй"
+                    else:
+                        model_task_list["offer"] = message.text
+                    set_task_step(5)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Название слота или тематики (Book of RA или, например, липриконы) : ",
+                        reply_markup=close_markup
+                    )
+                case 5:
+                    model_task_list["theme_name"] = message.text
+                    set_task_step(6)
+                    await bot.send_message(message.chat.id, "Эмоции (Да, Нет) : ", reply_markup=yes_no())
+                case 6:
+                    if message.text == "Да":
+                        model_task_list["emotions"] = "Да"
+                    else:
+                        model_task_list["emotions"] = "Нет"
+                    set_task_step(7)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Плашки (Google, Apple, Google и Apple) : ",
+                        reply_markup=plash_google_apple()
+                    )
+                case 7:
+                    model_task_list["tabs"] = message.text
+                    set_task_step(8)
+                    await bot.send_message(message.chat.id, "SMS (Да, Нет) : ", reply_markup=yes_no())
+                case 8:
+                    if message.text == "Да":
+                        model_task_list["sms"] = "Да"
+                    else:
+                        model_task_list["sms"] = "Нет"
+                    set_task_step(9)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Телефон с уведомлением (Да, Нет) : ",
+                        reply_markup=yes_no()
+                    )
+                case 9:
+                    if message.text == "Да":
+                        model_task_list["phone_notify"] = "Да"
+                    else:
+                        model_task_list["phone_notify"] = "Нет"
+                    set_task_step(10)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Название банка (если нужен конкретный) : ",
+                        reply_markup=skip_desc()
+                    )
+                case 10:
+                    if message.text == "Пропустить":
+                        model_task_list["name_bank"] = "-"
+                    else:
+                        model_task_list["name_bank"] = message.text
+                    set_task_step(11)
+                    await bot.send_message(message.chat.id, "Озвучка (если надо) : ", reply_markup=skip_desc())
+                case 11:
+                    if message.text == "Пропустить":
+                        model_task_list["sound"] = "-"
+                    else:
+                        model_task_list["sound"] = message.text
+                    set_task_step(12)
+                    await bot.send_message(message.chat.id, "Описание (нюансы пожелания) : ", reply_markup=skip_desc())
+                case 12:
+                    if message.text == "Пропустить":
+                        model_task_list["desc"] = "отсутствует"
+                    else:
+                        model_task_list["desc"] = message.text
+                    set_task_step(13)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Вложения для ТЗ: ссылки на картинки/видео через запятую"
+                        "Например: \nhttps://google.com/,https://google.com/",
+                        reply_markup=close_markup
+                    )
+                case 13:
+                    try:
+                        model_task_list["reference"] = message.text.split(",")
+                        if model_task_list["count"] > 1:
+                            set_task_step(14)
+                            await bot.send_message(
+                                message.chat.id,
+                                "Напишите чем должны отличаться остальные крео (или заполните форму под другие!) : ",
+                                reply_markup=skip_desc()
+                            )
+                        else:
+                            set_task_step(15)
+                            await bot.send_message(
+                                message.chat.id,
+                                "Введите дедлайн задачи в формате\n"
+                                "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                                reply_markup=choice_date()
+                            )
+                    except Exception as e:
+                        print(e)
+                        await bot.send_message(message.chat.id, "Попробуйте еще раз (формат через запятую) : ")
+                case 14:
+                    if message.text == "Пропустить":
+                        model_task_list["sub_desc"] = "\nОписание 2 : \nотсутствует"
+                    else:
+                        model_task_list["sub_desc"] = message.text
+                    set_task_step(15)
+                    await bot.send_message(
+                        message.chat.id,
+                        "Введите дедлайн задачи в формате\n"
+                        "ГОД-МЕСЯЦ-ЧИСЛО ЧАСЫ:МИНУТЫ\nНапример 2023-02-24 04:00",
+                        reply_markup=choice_date()
+                    )
+                case 15:
+                    try:
+                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                            dateTime = datetime.datetime.strptime(
+                                datetime.datetime.now().strftime("%Y-%m-%d") +
+                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
+                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                            dateTime = datetime.datetime.strptime(
+                                datetime.datetime.now().strftime("%Y-%m-%d") +
+                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                       + datetime.timedelta(days=1)
+                        elif message.text == "Пропустить":
+                            dateTime = ""
+                        else:
+                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+
+                        if model_task_list['count'] > 1:
+                            sub_desc = f"\n{model_task_list['sub_desc']}\n"
+                        else:
+                            sub_desc = ""
+
+                        desc_card = f"Кол-во креативов : {model_task_list['count']}\n" \
+                                    f"Гео : {model_task_list['geo']}\n" \
+                                    f"Валюта : {model_task_list['valuta']}\n" \
+                                    f"Формат : {model_task_list['format']}\n" \
+                                    f"Оффер : {model_task_list['offer']}\n" \
+                                    f"Название слота или тематики : {model_task_list['theme_name']}\n" \
+                                    f"Эмоции : {model_task_list['emotions']}\n" \
+                                    f"Плашки : {model_task_list['tabs']}\n" \
+                                    f"SMS : {model_task_list['sms']}\n" \
+                                    f"Телефон с уведомлением : {model_task_list['phone_notify']}\n" \
+                                    f"Название банка : {model_task_list['name_bank']}\n" \
+                                    f"Озвучка : {model_task_list['sound']}\n\n" \
+                                    f"Описание : \n{model_task_list['desc']}\n{sub_desc}\n" \
+                                    f"Связь в тг: @{message.chat.username}\n"
+                        # f"Референс : \n{model_task_list['reference']}\n\n" \
+
+                        current_user = get_user(message.chat.id)
+                        result_add_to_db = add_card(
+                            f"Order Creative by ({current_user.result.name_user})",
+                            f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
+                            "cards_creo"
+                        ).result
+
+                        if result_add_to_db is not None:
+                            card_id = create_card_creo(
+                                TrelloCard(
+                                    name=f"#{result_add_to_db['id']} Креатив ({model_task_list['theme_name']})",
+                                    desc=desc_card
+                                ),
+                                owner_dep=current_user.result.dep_user,
+                                owner_name=current_user.result.label_creo,
+                                date=dateTime
+                            )
+
+                            add_attachments_to_card(
+                                card_id=card_id.json()['id'],
+                                source=model_task_list['reference']
                             )
 
                             if card_id.ok:
@@ -1025,7 +1268,8 @@ async def prepare_vait(message):
 
 @bot.callback_query_handler(func=lambda call: call.data in (
         "edit_offer", "add_offer", "order_creative", "share_app", "other_task",
-        "pwa_app", "create_campaign", "set_domain", "setting_cloak", "prepare_vait", "my_task_creo", "my_task_tech"))
+        "pwa_app", "create_campaign", "set_domain", "setting_cloak", "prepare_vait",
+        "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo"))
 async def answer(call):
     global user_state
     set_state_none()  # reset user state
@@ -1064,6 +1308,28 @@ async def answer(call):
                     )
             case "order_creative":
                 if current_user.dep_user != "afmngr":
+                    if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin"):
+                        await bot.send_message(
+                            call.from_user.id,
+                            "Выберите тип креатива : ",
+                            reply_markup=choice_type_creo()
+                        )
+
+                    else:
+                        user_state = "order_creative"
+
+                        await bot.send_message(
+                            call.from_user.id,
+                            "Язык, валюта: (например: CAD/или символ валюты) : ",
+                            reply_markup=close_markup
+                        )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
+            case "standard_creo":
+                if current_user.dep_user != "afmngr":
                     user_state = "order_creative"
 
                     await bot.send_message(
@@ -1071,6 +1337,22 @@ async def answer(call):
                         "Язык, валюта: (например: CAD/или символ валюты) : ",
                         reply_markup=close_markup
                     )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Нет доступа, запросите у админов"
+                    )
+
+            case "gambling_creo":
+                if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin"):
+                    user_state = "order_creative_gamble"
+
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Введите количество креативов : ",
+                        reply_markup=close_markup
+                    )
+
                 else:
                     await bot.send_message(
                         call.from_user.id,

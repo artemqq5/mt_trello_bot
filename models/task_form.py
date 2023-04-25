@@ -10,6 +10,24 @@ model_task_list = {}
 # step (0-geo, 1-offer, 2-domains, 3-desc, 4-time) setting cloak
 # step (0-geo, 1-source, 2-link_tt, 3-desc, 4-time) prepare vait
 
+# order creo gamble STEP (
+# 0-count,
+# 1-geo,
+# 2-valuta,
+# 3-format,
+# 4-offer,
+# 5-theme_name,
+# 6-emotions,
+# 7-tabs,
+# 8-sms
+# 9-phone_notify
+# 10-name_bank
+# 11-sound
+# 12-desc
+# 13-reference
+# 14- if count > 1 (sub desc)
+# )
+
 task_step = {"step": 0, }
 
 

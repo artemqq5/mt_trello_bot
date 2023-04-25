@@ -64,3 +64,30 @@ def choice_date():
 
 def skip_desc():
     return types.ReplyKeyboardMarkup().add(types.KeyboardButton('Пропустить'))
+
+
+def yes_no():
+    return types.ReplyKeyboardMarkup().row(types.KeyboardButton('Да'), types.KeyboardButton('Нет'))
+
+
+def plash_google_apple():
+    markup = types.ReplyKeyboardMarkup()
+
+    markup.row(types.KeyboardButton('Google'), types.KeyboardButton('Apple'))
+    markup.add(types.KeyboardButton('Google и Apple'))
+
+    return markup
+
+
+def choice_type_creo():
+    markup = types.InlineKeyboardMarkup()
+
+    listButtons = (
+        types.InlineKeyboardButton('Стандарт', callback_data="standard_creo"),
+        types.InlineKeyboardButton('Gambling', callback_data="gambling_creo"),
+    )
+
+    for i in listButtons:
+        markup.add(i)
+
+    return markup
