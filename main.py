@@ -401,19 +401,15 @@ async def order_creo(message):
                         await bot.reply_to(message, "Краткое название должно быть до 40 символов : ")
                 case 9:
                     try:
-                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                             dateTime = datetime.datetime.strptime(
                                 datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                            dateTime = datetime.datetime.strptime(
-                                datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                        + datetime.timedelta(days=1)
                         elif message.text == "Пропустить":
                             dateTime = ""
                         else:
-                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                            dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                         desc_card = f"Валюта : {model_task_list['currency_type']}\n" \
                                     f"Гео : {model_task_list['geo']}\n" \
@@ -631,19 +627,15 @@ async def order_creo_gamble(message):
                     )
                 case 15:
                     try:
-                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                             dateTime = datetime.datetime.strptime(
                                 datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                            dateTime = datetime.datetime.strptime(
-                                datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                        + datetime.timedelta(days=1)
                         elif message.text == "Пропустить":
                             dateTime = ""
                         else:
-                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                            dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                         if model_task_list['count'] > 1:
                             sub_desc = f"\n{model_task_list['sub_desc']}\n"
@@ -802,19 +794,15 @@ async def other_task(message):
                     )
                 case 2:
                     try:
-                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                             dateTime = datetime.datetime.strptime(
                                 datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                            dateTime = datetime.datetime.strptime(
-                                datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                        + datetime.timedelta(days=1)
                         elif message.text == "Пропустить":
                             dateTime = ""
                         else:
-                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                            dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                         desc_card = f"{model_task_list['desc']}\n\n" \
                                     f"Связь в тг: @{message.chat.username}\n"
@@ -883,19 +871,15 @@ async def pwa_(message):
                     )
                 case 3:
                     try:
-                        if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                        if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                             dateTime = datetime.datetime.strptime(
                                 datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                        elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                            dateTime = datetime.datetime.strptime(
-                                datetime.datetime.now().strftime("%Y-%m-%d") +
-                                " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                                " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                        + datetime.timedelta(days=1)
                         elif message.text == "Пропустить":
                             dateTime = ""
                         else:
-                            dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                            dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                         desc_card = f"Гео : {model_task_list['geo']}\n" \
                                     f"Название приложения :  {model_task_list['name']}\n\n" \
@@ -1035,19 +1019,15 @@ async def set_domain(message):
 
             case 2:
                 try:
-                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                    if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                         dateTime = datetime.datetime.strptime(
                             datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                        dateTime = datetime.datetime.strptime(
-                            datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                            " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                    + datetime.timedelta(days=1)
                     elif message.text == "Пропустить":
                         dateTime = ""
                     else:
-                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                        dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                     desc_card = f"Названия доменов : {model_task_list['offer_names']}\n\n" \
                                 f"Описание : {model_task_list['desc']}\n\n" \
@@ -1120,19 +1100,15 @@ async def setting_cloak(message):
 
             case 4:
                 try:
-                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                    if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                         dateTime = datetime.datetime.strptime(
                             datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                        dateTime = datetime.datetime.strptime(
-                            datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                            " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                    + datetime.timedelta(days=1)
                     elif message.text == "Пропустить":
                         dateTime = ""
                     else:
-                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                        dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                     desc_card = f"Гео : {model_task_list['geo']}\n\n" \
                                 f"Оффер : {model_task_list['offer']}\n\n" \
@@ -1207,19 +1183,15 @@ async def prepare_vait(message):
 
             case 4:
                 try:
-                    if message.text in ("Сегодня 12:00", "Сегодня 15:00", "Сегодня 18:00"):
+                    if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                         dateTime = datetime.datetime.strptime(
                             datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z')
-                    elif message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
-                        dateTime = datetime.datetime.strptime(
-                            datetime.datetime.now().strftime("%Y-%m-%d") +
-                            " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
+                            " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
                                    + datetime.timedelta(days=1)
                     elif message.text == "Пропустить":
                         dateTime = ""
                     else:
-                        dateTime = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
+                        dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
 
                     desc_card = f"Гео : {model_task_list['geo']}\n" \
                                 f"Исходники : {model_task_list['source']}\n\n" \

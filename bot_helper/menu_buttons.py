@@ -49,11 +49,6 @@ def choice_date():
     markup.add(types.KeyboardButton('Пропустить'))
 
     markup.row(
-        types.KeyboardButton('Сегодня 12:00'),
-        types.KeyboardButton('Сегодня 15:00'),
-        types.KeyboardButton('Сегодня 18:00'),
-    )
-    markup.row(
         types.KeyboardButton('Завтра 12:00'),
         types.KeyboardButton('Завтра 15:00'),
         types.KeyboardButton('Завтра 18:00'),
