@@ -6,8 +6,8 @@ def af_manager_menu():
     markup = types.InlineKeyboardMarkup()
 
     listButtons = (
-        types.InlineKeyboardButton('Редактировать оффер 🔧', callback_data="edit_offer"),
-        types.InlineKeyboardButton('Добавить оффер ➕', callback_data="add_offer"),
+        types.InlineKeyboardButton('Редагувати оффер 🔧', callback_data="edit_offer"),
+        types.InlineKeyboardButton('Додати оффер ➕', callback_data="add_offer"),
     )
 
     for i in listButtons:
@@ -19,8 +19,8 @@ def af_manager_menu():
 def choice_offer_type():
     markup = types.ReplyKeyboardMarkup()
 
-    markup.add(types.KeyboardButton('Новый'))
-    markup.add(types.KeyboardButton('Существующий'))
+    markup.add(types.KeyboardButton('Новий'))
+    markup.add(types.KeyboardButton('Існуючий'))
 
     return markup
 # ==================AF Manager end===================

@@ -7,7 +7,7 @@ def setStartButton():
     markup = types.ReplyKeyboardMarkup()
 
     listButtons = (
-        types.KeyboardButton('Мои Задания 📋'),
+        types.KeyboardButton('Мої Завдання 📋'),
         types.KeyboardButton('Gambling FB'),
         types.KeyboardButton('Gambling PPC'),
         types.KeyboardButton('Gambling UAC'),
@@ -36,8 +36,8 @@ def manage_card():
     markup = types.InlineKeyboardMarkup()
 
     markup.row(
-        types.InlineKeyboardButton('Удалить задание', callback_data="delete_card"),
-        types.InlineKeyboardButton('Написать комментарий', callback_data="commend_card")
+        types.InlineKeyboardButton('Видалити завдання', callback_data="delete_card"),
+        types.InlineKeyboardButton('Написати коментар', callback_data="commend_card")
     )
 
     return markup
@@ -46,13 +46,8 @@ def manage_card():
 def choice_date():
     markup = types.ReplyKeyboardMarkup()
 
-    markup.add(types.KeyboardButton('Пропустить'))
+    markup.add(types.KeyboardButton('Пропустити'))
 
-    markup.row(
-        types.KeyboardButton('Сегодня 12:00'),
-        types.KeyboardButton('Сегодня 15:00'),
-        types.KeyboardButton('Сегодня 18:00'),
-    )
     markup.row(
         types.KeyboardButton('Завтра 12:00'),
         types.KeyboardButton('Завтра 15:00'),
@@ -63,4 +58,31 @@ def choice_date():
 
 
 def skip_desc():
-    return types.ReplyKeyboardMarkup().add(types.KeyboardButton('Пропустить'))
+    return types.ReplyKeyboardMarkup().add(types.KeyboardButton('Пропустити'))
+
+
+def yes_no():
+    return types.ReplyKeyboardMarkup().row(types.KeyboardButton('Так'), types.KeyboardButton('Ні'))
+
+
+def plash_google_apple():
+    markup = types.ReplyKeyboardMarkup()
+
+    markup.row(types.KeyboardButton('Google'), types.KeyboardButton('Apple'))
+    markup.add(types.KeyboardButton('Google и Apple'))
+
+    return markup
+
+
+def choice_type_creo():
+    markup = types.InlineKeyboardMarkup()
+
+    listButtons = (
+        types.InlineKeyboardButton('Стандарт', callback_data="standard_creo"),
+        types.InlineKeyboardButton('Gambling', callback_data="gambling_creo"),
+    )
+
+    for i in listButtons:
+        markup.add(i)
+
+    return markup
