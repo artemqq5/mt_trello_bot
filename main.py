@@ -292,11 +292,12 @@ async def offer_add(message):
                     result_add_to_db = add_card(
                         f"Add offer by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} {model_task_list['operation']} ({model_task_list['offer_name']})",
                                 desc=desc_card
@@ -304,6 +305,8 @@ async def offer_add(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech
                         )
+
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -340,11 +343,12 @@ async def offer_edit(message):
                     result_add_to_db = add_card(
                         f"Edit offer by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} {model_task_list['operation']} ({model_task_list['offer_id']})",
                                 desc=desc_card
@@ -352,6 +356,8 @@ async def offer_edit(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech
                         )
+
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -450,11 +456,12 @@ async def order_creo(message):
                         result_add_to_db = add_card(
                             f"Order Creative by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                            "cards_creo"
+                            "cards_creo",
+                            message.chat.id,
                         ).result
 
                         if result_add_to_db is not None:
-                            card_id = create_card_creo(
+                            card = card_id = create_card_creo(
                                 TrelloCard(
                                     name=f"#{result_add_to_db['id']} Креатив ({model_task_list['title']})",
                                     desc=desc_card
@@ -463,6 +470,8 @@ async def order_creo(message):
                                 owner_name=current_user.result.label_creo,
                                 date=dateTime
                             )
+
+                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
                             add_attachments_to_card(
                                 card_id=card_id.json()['id'],
@@ -684,11 +693,12 @@ async def order_creo_gamble(message):
                         result_add_to_db = add_card(
                             f"Order Creative by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                            "cards_creo"
+                            "cards_creo",
+                            message.chat.id,
                         ).result
 
                         if result_add_to_db is not None:
-                            card_id = create_card_creo(
+                            card = card_id = create_card_creo(
                                 TrelloCard(
                                     name=f"#{result_add_to_db['id']} Креатив ({model_task_list['theme_name']})",
                                     desc=desc_card
@@ -697,6 +707,7 @@ async def order_creo_gamble(message):
                                 owner_name=current_user.result.label_creo,
                                 date=dateTime
                             )
+                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
                             add_attachments_to_card(
                                 card_id=card_id.json()['id'],
@@ -770,11 +781,12 @@ async def share_app(message):
                     result_add_to_db = add_card(
                         f"Share app by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} Розшарити прілу ({model_task_list['name_app']})",
                                 desc=desc_card
@@ -782,6 +794,7 @@ async def share_app(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech
                         )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -831,11 +844,12 @@ async def other_task(message):
                         result_add_to_db = add_card(
                             f"custom_task by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                            "cards_tech"
+                            "cards_tech",
+                            message.chat.id,
                         ).result
 
                         if result_add_to_db is not None:
-                            create_card_tech(
+                            card = create_card_tech(
                                 TrelloCard(
                                     name=f"#{result_add_to_db['id']} {model_task_list['title']}",
                                     desc=desc_card
@@ -844,6 +858,7 @@ async def other_task(message):
                                 owner_name=current_user.result.label_tech,
                                 date=dateTime
                             )
+                            update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                             await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                    reply_markup=setStartButton())
                         else:
@@ -908,11 +923,12 @@ async def pwa_(message):
                         result_add_to_db = add_card(
                             f"PWA by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                            "cards_tech"
+                            "cards_tech",
+                            message.chat.id,
                         ).result
 
                         if result_add_to_db is not None:
-                            create_card_tech(
+                            card = create_card_tech(
                                 TrelloCard(
                                     name=f"#{result_add_to_db['id']} Створити PWA додаток ({model_task_list['name']})",
                                     desc=desc_card
@@ -921,6 +937,7 @@ async def pwa_(message):
                                 owner_name=current_user.result.label_tech,
                                 date=dateTime
                             )
+                            update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                             await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                    reply_markup=setStartButton())
                         else:
@@ -987,11 +1004,12 @@ async def create_campaign(message):
                     result_add_to_db = add_card(
                         f"Create campaign by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} Створити кампанію ({model_task_list['app_name']})",
                                 desc=desc_card
@@ -999,6 +1017,7 @@ async def create_campaign(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech,
                         )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1053,11 +1072,12 @@ async def set_domain(message):
                     result_add_to_db = add_card(
                         f"Park domain by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} Припаркувати домен",
                                 desc=desc_card
@@ -1066,6 +1086,7 @@ async def set_domain(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1134,11 +1155,12 @@ async def setting_cloak(message):
                     result_add_to_db = add_card(
                         f"Setting cloak by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} Налаштувати клоаку",
                                 desc=desc_card
@@ -1147,6 +1169,7 @@ async def setting_cloak(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1215,11 +1238,12 @@ async def prepare_vait(message):
                     result_add_to_db = add_card(
                         f"Prepare vait by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
-                        "cards_tech"
+                        "cards_tech",
+                        message.chat.id,
                     ).result
 
                     if result_add_to_db is not None:
-                        create_card_tech(
+                        card = create_card_tech(
                             TrelloCard(
                                 name=f"#{result_add_to_db['id']} Підготувати вайт",
                                 desc=desc_card
@@ -1228,6 +1252,7 @@ async def prepare_vait(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:

@@ -9,7 +9,6 @@ if DEBUG_MODE:
     DB_NAME = local_name_db
 else:
     CONNECTION_PASSWORD = server_password_connection
-    # Нужно создать базу с таблицами на сервере !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     DB_NAME = server_name_db
 
 
@@ -98,11 +97,11 @@ def get_list_users():
         return ResultData(None, f"error: {e}")
 
 
-def add_card(name, desc, tb_name):
+def add_card(name, desc, tb_name, id_user, id_card='null'):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
-                card_add_command = f"INSERT INTO `{tb_name}` (`name`, `desc`) VALUES ('{name}', '{desc}');"
+                card_add_command = f"INSERT INTO `{tb_name}` (`name`, `desc`, `id_user`, `id_card`) VALUES ('{name}', '{desc}', '{id_user}', '{id_card}');"
                 get_num_last_card = f"SELECT `id` FROM `{tb_name}`;"
 
                 cursor.execute(card_add_command)
@@ -114,6 +113,18 @@ def add_card(name, desc, tb_name):
     except Exception as e:
         print(f"add_card: {e}")
         return ResultData(None, f"error: {e}")
+
+
+def update_card(id_pk, id_card, tb_name):
+    try:
+        with connect_db() as connection:
+            with connection.cursor() as cursor:
+                card_update_command = f"UPDATE `{tb_name}` SET `id_card` = '{id_card}' WHERE `id` = '{id_pk}';"
+                cursor.execute(card_update_command)
+
+            connection.commit()
+    except Exception as e:
+        print(f"update_card: {e}")
 
 
 class User:
