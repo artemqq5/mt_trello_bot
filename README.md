@@ -17,3 +17,4 @@
 
 <b>Other</b>
 - manage exist tasks (view, delete, comment)
+- send notification when task is done by webhook
