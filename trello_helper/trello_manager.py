@@ -110,7 +110,7 @@ def create_card_tech(card, owner_dep, owner_name, date=""):
         'due': date
     }
 
-    requests.request(
+    return requests.request(
         "POST",
         url=urlCard,
         headers={"Accept": "application/json"},
