@@ -397,7 +397,7 @@ async def order_creo(message):
                     set_task_step(4)
                     await bot.send_message(
                         message.chat.id,
-                        "Вкладення для ТЗ: посилання на картинки/відео через кому"
+                        "Вкладення для ТЗ: посилання на картинки/відео через кому "
                         "Наприклад: \nhttps://google.com/,https://google.com/"
                     )
                 case 4:
@@ -564,10 +564,7 @@ async def order_creo_gamble(message):
                     set_task_step(6)
                     await bot.send_message(message.chat.id, "Емоції (Так, Ні) : ", reply_markup=yes_no())
                 case 6:
-                    if message.text == "Так":
-                        model_task_list["emotions"] = "Так"
-                    else:
-                        model_task_list["emotions"] = "Ні"
+                    model_task_list["emotions"] = message.text
                     set_task_step(7)
                     await bot.send_message(
                         message.chat.id,
@@ -579,10 +576,7 @@ async def order_creo_gamble(message):
                     set_task_step(8)
                     await bot.send_message(message.chat.id, "SMS (Так, Ні) : ", reply_markup=yes_no())
                 case 8:
-                    if message.text == "Так":
-                        model_task_list["sms"] = "Так"
-                    else:
-                        model_task_list["sms"] = "Ні"
+                    model_task_list["sms"] = message.text
                     set_task_step(9)
                     await bot.send_message(
                         message.chat.id,
@@ -590,10 +584,7 @@ async def order_creo_gamble(message):
                         reply_markup=yes_no()
                     )
                 case 9:
-                    if message.text == "Так":
-                        model_task_list["phone_notify"] = "Так"
-                    else:
-                        model_task_list["phone_notify"] = "Ні"
+                    model_task_list["phone_notify"] = message.text
                     set_task_step(10)
                     await bot.send_message(
                         message.chat.id,
@@ -622,7 +613,7 @@ async def order_creo_gamble(message):
                     set_task_step(13)
                     await bot.send_message(
                         message.chat.id,
-                        "Вкладення для ТЗ: посилання на картинки/відео через кому"
+                        "Вкладення для ТЗ: посилання на картинки/відео через кому "
                         "Наприклад: \nhttps://google.com/,https://google.com/",
                         reply_markup=close_markup
                     )
