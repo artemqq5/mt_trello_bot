@@ -49,7 +49,7 @@ modes = {
 user_state = "none"
 
 # dep states
-dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media"}
+dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc"}
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
@@ -1358,7 +1358,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "share_app":
-                if current_user.dep_user in ("gamblefb", "gambleuac", "admin"):
+                if current_user.dep_user in ("gamblefb", "gambleuac", "admin", "gambleuac_gambleppc"):
                     user_state = "share_app"
 
                     await bot.send_message(
@@ -1386,7 +1386,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "pwa_app":
-                if current_user.dep_user in ("gamblefb", "gambleuac", "admin"):
+                if current_user.dep_user in ("gamblefb", "gambleuac", "admin", "gambleuac_gambleppc"):
                     user_state = "pwa_app"
 
                     await bot.send_message(
@@ -1414,7 +1414,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "set_domain":
-                if current_user.dep_user in ("gambleppc", "admin"):
+                if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
                     user_state = "set_domain"
 
                     await bot.send_message(
@@ -1428,7 +1428,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "setting_cloak":
-                if current_user.dep_user in ("gambleppc", "admin"):
+                if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
                     user_state = "setting_cloak"
 
                     await bot.send_message(
@@ -1442,7 +1442,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "prepare_vait":
-                if current_user.dep_user in ("gambleppc", "admin"):
+                if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
                     user_state = "prepare_vait"
 
                     await bot.send_message(
