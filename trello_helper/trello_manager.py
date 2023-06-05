@@ -26,6 +26,7 @@ if DEBUG_MODE:
         'gamblefb': "640484eb648168166b969afc",
         'afmngr': "640484db11324cef2b6b24d2",
         'media': "640484d2b0f7e9d9e06e4617",
+        'gambleuac_gambleppc': "647e3969f8ecd50ecf48e3bf",
     }
     card_labels_creo = {
         'admin': "63f13a1d58e626baa8577a1b",
@@ -34,6 +35,7 @@ if DEBUG_MODE:
         'gamblefb': "64048456b3fa400da1d5e145",
         'afmngr': "6404846d85bbd09e92d1f715",
         'media': "64048477f9e3e14232c3430b",
+        'gambleuac_gambleppc': "647e39146cdf6e588a62f2d6",
     }
 else:
     API_KEY_TRELLO = server_api_key_trello
@@ -52,6 +54,7 @@ else:
         'gamblefb': "635cfb6e71b54701df49070c",
         'afmngr': "63ab08faaf2cb403e4f5516b",
         'media': "6404832e79e458c4683a9c77",
+        'gambleuac_gambleppc': "647e383b9a078c0f54f34754",
     }
     card_labels_creo = {
         'admin': "63886c84a055ba018fd0f714",
@@ -60,6 +63,7 @@ else:
         'gamblefb': "63d12587d8379f44194d4501",
         'afmngr': "6404835b966d3b4c25e92a5b",
         'media': "640480f372fb31ec890d8631",
+        'gambleuac_gambleppc': "647e38d6831410f5804efb87",
     }
 
 # dict for every request
