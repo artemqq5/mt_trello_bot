@@ -1307,7 +1307,7 @@ async def answer(call):
                     )
             case "order_creative":
                 if current_user.dep_user != "afmngr":
-                    if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin"):
+                    if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc"):
                         await bot.send_message(
                             call.from_user.id,
                             "Виберіть тип креативу : ",
@@ -1343,7 +1343,7 @@ async def answer(call):
                     )
 
             case "gambling_creo":
-                if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin"):
+                if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc"):
                     user_state = "order_creative_gamble"
 
                     await bot.send_message(
@@ -1372,7 +1372,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "other_task":
-                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin"):
+                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin", "gambleuac_gambleppc"):
                     user_state = "other_task"
 
                     await bot.send_message(
@@ -1400,7 +1400,7 @@ async def answer(call):
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
             case "create_campaign":
-                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin"):
+                if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin", "gambleuac_gambleppc"):
                     user_state = "create_campaign"
 
                     await bot.send_message(
