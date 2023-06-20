@@ -44,6 +44,8 @@ modes = {
     "set_domain",
     "setting_cloak",
     "prepare_vait",
+
+    "media_other_task",
 }
 
 user_state = "none"
@@ -1268,7 +1270,7 @@ async def prepare_vait(message):
 @bot.callback_query_handler(func=lambda call: call.data in (
         "edit_offer", "add_offer", "order_creative", "share_app", "other_task",
         "pwa_app", "create_campaign", "set_domain", "setting_cloak", "prepare_vait",
-        "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo"))
+        "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo", "other_media"))
 async def answer(call):
     global user_state
     set_state_none()  # reset user state
@@ -1455,6 +1457,20 @@ async def answer(call):
                         call.from_user.id,
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
+            case "other_media":
+                if current_user.dep_user in ("media", "admin"):
+                    user_state = "prepare_vait"
+
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Гео : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        HAVE_NOT_ACCESS_CALL_ADMINS
+                    )
             case "my_task_creo":
                 creo_tasks = get_tasks(typeListId=idList_creo, userlabel=current_user.label_creo)
                 if creo_tasks.markup is None:
@@ -1468,6 +1484,7 @@ async def answer(call):
                     await bot.send_message(call.from_user.id, creo_tasks.message)
                 else:
                     await bot.send_message(call.from_user.id, "Ваші завдання tech : ", reply_markup=creo_tasks.markup)
+
     else:
         await bot.send_message(call.from_user.id, NOT_REGISTERED_USER,
                                reply_markup=close_markup)
