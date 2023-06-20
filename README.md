@@ -8,7 +8,7 @@
 
 <b>main functions:</b>
 - af_manager (add offer -> (new, exist), edit offer)
-- media (order creo)
+- media (order creo, other task)
 - gambling FB (share app, create campign, pwa, order creo, other)
 - gambling UAC (share app, create campign, pwa, order creo, other)
 - gambling PPC (set domain, prepare vait, setting cloak, create campign, order creo, other)
