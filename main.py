@@ -744,6 +744,119 @@ async def order_creo_gamble(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
+@bot.message_handler(func=lambda m: user_state == "media_other_task")  # todo
+async def media_other_task(message):
+    if get_user(message.chat.id).result is not None:
+        if len(message.text) < 100 or task_step["step"] in (3,):
+            match task_step["step"]:
+                case 0:
+                    try:
+                        model_task_list["count"] = int(message.text)
+                        set_task_step(1)
+                        await bot.send_message(message.chat.id, "Оберіть джерело : ",reply_markup=choice_source_media())
+                    except Exception as e:
+                        print(f"media_other_task (input count of creo) {e}")
+                        await bot.send_message(message.chat.id, "Введіть число : ", reply_markup=close_markup)
+                case 1:
+                    model_task_list["source"] = message.text
+                    match message.text:
+                        case 'Instagram':
+                            set_task_step(2)
+                            await bot.send_message(message.chat.id, "Назва публікації : ", reply_markup=close_markup)
+                        case 'MT Shop':
+                            set_task_step(2)
+                            await bot.send_message(message.chat.id, "Аккаунт або Додаток : ", reply_markup=account_or_app_media())
+                        case _:
+                            set_task_step(3)
+                            await bot.send_message(message.chat.id, "Опис : ", reply_markup=skip_desc())
+                case 2:
+                    model_task_list["source_sub"] = message.text
+                    set_task_step(3)
+                    await bot.send_message(message.chat.id, "Опис : ", reply_markup=skip_desc())
+                case 3:
+                    model_task_list["desc"] = "Опис не додано" if message.text == "Пропустити" else message.text
+                    set_task_step(4)
+                    await bot.send_message(
+                        message.chat.id,
+                        TIME_CHOICE,
+                        reply_markup=choice_date()
+                    )
+                case 4:
+                    try:
+                        if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                            dateTime = datetime.datetime.strptime(
+                                datetime.datetime.now().strftime("%Y-%m-%d") +
+                                " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                                       + datetime.timedelta(days=1)
+                        elif message.text == SKIP:
+                            dateTime = ""
+                        else:
+                            dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+
+                        sub_source = f"({model_task_list['source_sub']})" if model_task_list['source'] in (
+                            'Instagram', 'MT Shop') else ""
+                        desc_card = f"Кількість : {model_task_list['count']}\n" \
+                                    f"Джерело : {model_task_list['source']} {sub_source}\n\n" \
+                                    f"Опис : \n{model_task_list['desc']}\n\n" \
+                                    f"Зв'язок у тг: @{message.chat.username}\n"
+
+                        current_user = get_user(message.chat.id)
+                        result_add_to_db = add_card(
+                            f"Media Other by ({current_user.result.name_user})",
+                            f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
+                            "cards_creo",
+                            message.chat.id,
+                        ).result
+
+                        if result_add_to_db is not None:
+                            card = card_id = create_card_creo(
+                                TrelloCard(
+                                    name=f"#{result_add_to_db['id']} Креатив ({model_task_list['source']})",
+                                    desc=desc_card
+                                ),
+                                owner_dep=current_user.result.dep_user,
+                                owner_name=current_user.result.label_creo,
+                                date=dateTime
+                            )
+                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
+
+                            if card_id.ok:
+                                await bot.send_message(
+                                    message.chat.id,
+                                    MESSAGE_SEND,
+                                    reply_markup=setStartButton()
+                                )
+                            else:
+                                await bot.send_message(
+                                    message.chat.id,
+                                    MESSAGE_DONT_SEND,
+                                    reply_markup=setStartButton()
+                                )
+
+                            set_state_none()  # reset user state
+                        else:
+                            await bot.send_message(
+                                message.chat.id,
+                                MESSAGE_DONT_SEND,
+                                reply_markup=setStartButton()
+                            )
+                            set_state_none()  # reset user state
+
+                    except Exception as e:
+                        print(e)
+                        if str(e).__contains__("does not match format '%Y-%m-%d %H:%M %z'"):
+                            await bot.reply_to(
+                                message,
+                                WRONG_TIME_CHOICE
+                            )
+                        else:
+                            set_state_none()  # reset user state
+        else:
+            await bot.reply_to(message, MESSAGE_UP_TO_100)
+    else:
+        await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
+
+
 @bot.message_handler(func=lambda m: user_state == "share_app")
 async def share_app(message):
     if get_user(message.chat.id).result is not None:
@@ -1191,7 +1304,7 @@ async def prepare_vait(message):
             case 0:
                 model_task_list['geo'] = message.text
                 set_task_step(1)
-                await bot.send_message(message.chat.id, "Введіть вихідні дані : ")
+                await bot.send_message(message.chat.id, "Введіть джерело : ")
             case 1:
                 model_task_list['source'] = message.text
                 set_task_step(2)
@@ -1457,13 +1570,13 @@ async def answer(call):
                         call.from_user.id,
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
-            case "other_media":
+            case "other_media":  # todo
                 if current_user.dep_user in ("media", "admin"):
-                    user_state = "prepare_vait"
+                    user_state = "media_other_task"
 
                     await bot.send_message(
                         call.from_user.id,
-                        "Гео : ",
+                        "Кількість : ",
                         reply_markup=close_markup
                     )
                 else:

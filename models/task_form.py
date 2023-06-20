@@ -9,6 +9,7 @@ model_task_list = {}
 # step (0-names, 1-desc, 2-time) set domain
 # step (0-geo, 1-offer, 2-domains, 3-desc, 4-time) setting cloak
 # step (0-geo, 1-source, 2-link_tt, 3-desc, 4-time) prepare vait
+# step (0-count, 1-source, 2-link_tt, 3-(optional), 4-desc, 5-time) media other
 
 # order creo gamble STEP (
 # 0-count,
