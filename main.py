@@ -51,7 +51,7 @@ modes = {
 user_state = "none"
 
 # dep states
-dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc"}
+dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc", "tech"}
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
@@ -744,7 +744,7 @@ async def order_creo_gamble(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "media_other_task")  # todo
+@bot.message_handler(func=lambda m: user_state == "media_other_task")
 async def media_other_task(message):
     if get_user(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] in (3,):
@@ -1570,7 +1570,7 @@ async def answer(call):
                         call.from_user.id,
                         HAVE_NOT_ACCESS_CALL_ADMINS
                     )
-            case "other_media":  # todo
+            case "other_media":
                 if current_user.dep_user in ("media", "admin"):
                     user_state = "media_other_task"
 
