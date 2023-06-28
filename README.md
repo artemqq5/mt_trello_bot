@@ -18,3 +18,4 @@
 <b>Other</b>
 - manage exist tasks (view, delete, comment)
 - send notification when task is done by webhook
+- send notification when list get a new task (only for tech)
