@@ -53,7 +53,8 @@ modes = {
 user_state = "none"
 
 # dep states
-dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc", "tech"}
+dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc", "tech",
+              "mt_partners"}
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
@@ -1680,14 +1681,19 @@ async def answer(call):
                 else:
                     await bot.send_message(call.from_user.id, "Ваші завдання tech : ", reply_markup=creo_tasks.markup)
             case "masons_partners":
-                user_state = "masons_partners"
-                await bot.send_message(
-                    call.from_user.id,
-                    "Введіть назву для завдання : ",
-                    reply_markup=close_markup
-                )
-                pass
+                if current_user.dep_user in ("mt_partners", "admin"):
+                    user_state = "masons_partners"
 
+                    await bot.send_message(
+                        call.from_user.id,
+                        "Введіть назву для завдання : ",
+                        reply_markup=close_markup
+                    )
+                else:
+                    await bot.send_message(
+                        call.from_user.id,
+                        HAVE_NOT_ACCESS_CALL_ADMINS
+                    )
     else:
         await bot.send_message(call.from_user.id, NOT_REGISTERED_USER,
                                reply_markup=close_markup)
