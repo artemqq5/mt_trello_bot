@@ -8,6 +8,7 @@ def setStartButton():
 
     listButtons = (
         types.KeyboardButton('Мої Завдання 📋'),
+        types.KeyboardButton('Masons Partners'),
         types.KeyboardButton('Gambling FB'),
         types.KeyboardButton('Gambling PPC'),
         types.KeyboardButton('Gambling UAC'),

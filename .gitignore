@@ -2,3 +2,4 @@ private_config.py
 .idea/
 __pycache__/
 myvenv/
+venv/

@@ -6,6 +6,7 @@ from bot_helper.af_manager_buttons import *
 from bot_helper.gambling_fb_buttons import *
 from bot_helper.gambling_ppc_buttons import *
 from bot_helper.gambling_uac_buttons import *
+from bot_helper.masons_partners import masons_partners_menu
 from bot_helper.media_buttons import *
 from db_helper.db_manager import *
 from bot_helper.menu_buttons import *
@@ -46,6 +47,7 @@ modes = {
     "prepare_vait",
 
     "media_other_task",
+    "masons_partners",
 }
 
 user_state = "none"
@@ -209,7 +211,8 @@ async def user_mailing(message):
 
 
 @bot.message_handler(
-    func=lambda m: m.text in ("Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Media", "Мої Завдання 📋"))
+    func=lambda m: m.text in (
+    "Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Media", "Мої Завдання 📋", "Masons Partners"))
 async def choice_category(message):
     set_state_none()  # reset user state
 
@@ -227,6 +230,8 @@ async def choice_category(message):
                 await bot.send_message(message.chat.id, message.text + ": ", reply_markup=gambling_uac_menu())
             case "Мої Завдання 📋":
                 await bot.send_message(message.chat.id, message.text + " : ", reply_markup=my_tasks_menu())
+            case "Masons Partners":
+                await bot.send_message(message.chat.id, message.text + " : ", reply_markup=masons_partners_menu())
             case _:
                 await bot.reply_to(message, "(У розробці)")
     else:
@@ -753,7 +758,8 @@ async def media_other_task(message):
                     try:
                         model_task_list["count"] = int(message.text)
                         set_task_step(1)
-                        await bot.send_message(message.chat.id, "Оберіть джерело : ",reply_markup=choice_source_media())
+                        await bot.send_message(message.chat.id, "Оберіть джерело : ",
+                                               reply_markup=choice_source_media())
                     except Exception as e:
                         print(f"media_other_task (input count of creo) {e}")
                         await bot.send_message(message.chat.id, "Введіть число : ", reply_markup=close_markup)
@@ -765,7 +771,8 @@ async def media_other_task(message):
                             await bot.send_message(message.chat.id, "Назва публікації : ", reply_markup=close_markup)
                         case 'MT Shop':
                             set_task_step(2)
-                            await bot.send_message(message.chat.id, "Аккаунт або Додаток : ", reply_markup=account_or_app_media())
+                            await bot.send_message(message.chat.id, "Аккаунт або Додаток : ",
+                                                   reply_markup=account_or_app_media())
                         case _:
                             set_task_step(3)
                             await bot.send_message(message.chat.id, "Опис : ", reply_markup=skip_desc())
@@ -1321,7 +1328,6 @@ async def prepare_vait(message):
                     TIME_CHOICE,
                     reply_markup=choice_date()
                 )
-
             case 4:
                 try:
                     if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
@@ -1380,10 +1386,86 @@ async def prepare_vait(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
+@bot.message_handler(func=lambda m: user_state == "masons_partners")
+async def masons_partners(message):
+    if get_user(message.chat.id).result is not None:
+        match task_step["step"]:
+            case 0:
+                model_task_list['name'] = message.text
+                set_task_step(1)
+                await bot.send_message(
+                    message.chat.id,
+                    "Введіть опис до завдання",
+                    reply_markup=close_markup
+                )
+            case 1:
+                model_task_list['desc'] = message.text
+                set_task_step(2)
+                await bot.send_message(
+                    message.chat.id,
+                    TIME_CHOICE,
+                    reply_markup=choice_date()
+                )
+            case 2:
+                try:
+                    if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
+                        dateTime = datetime.datetime.strptime(
+                            datetime.datetime.now().strftime("%Y-%m-%d") +
+                            " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                                   + datetime.timedelta(days=1)
+                    elif message.text == SKIP:
+                        dateTime = ""
+                    else:
+                        dateTime = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+
+                    desc_card = f"Опис : {model_task_list['desc']}\n\n" \
+                                f"Зв'язок у тг: @{message.chat.username}\n"
+
+                    current_user = get_user(message.chat.id)
+                    result_add_to_db = add_card(
+                        name=f"Masons Partners by ({current_user.result.name_user})",
+                        desc=f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
+                        tb_name="cards_tech",
+                        id_user=message.chat.id,
+                    ).result
+
+                    if result_add_to_db is not None:
+                        card = create_card_tech(
+                            TrelloCard(
+                                name=f"#{result_add_to_db['id']} {model_task_list['name']}",
+                                desc=desc_card
+                            ),
+                            owner_dep=current_user.result.dep_user,
+                            owner_name=current_user.result.label_tech,
+                            date=dateTime,
+                            is_masons_partners=True
+                        )
+                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        await bot.send_message(message.chat.id, MESSAGE_SEND,
+                                               reply_markup=setStartButton())
+                    else:
+                        await bot.send_message(
+                            message.chat.id,
+                            MESSAGE_DONT_SEND,
+                            reply_markup=setStartButton()
+                        )
+
+                    set_state_none()  # reset user state
+                except Exception as e:
+                    print(e)
+                    await bot.reply_to(
+                        message,
+                        WRONG_TIME_CHOICE
+                    )
+    else:
+        await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
+
+
 @bot.callback_query_handler(func=lambda call: call.data in (
         "edit_offer", "add_offer", "order_creative", "share_app", "other_task",
         "pwa_app", "create_campaign", "set_domain", "setting_cloak", "prepare_vait",
-        "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo", "other_media"))
+        "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo", "other_media",
+        "masons_partners"))
 async def answer(call):
     global user_state
     set_state_none()  # reset user state
@@ -1597,6 +1679,14 @@ async def answer(call):
                     await bot.send_message(call.from_user.id, creo_tasks.message)
                 else:
                     await bot.send_message(call.from_user.id, "Ваші завдання tech : ", reply_markup=creo_tasks.markup)
+            case "masons_partners":
+                user_state = "masons_partners"
+                await bot.send_message(
+                    call.from_user.id,
+                    "Введіть назву для завдання : ",
+                    reply_markup=close_markup
+                )
+                pass
 
     else:
         await bot.send_message(call.from_user.id, NOT_REGISTERED_USER,
