@@ -27,7 +27,7 @@ if DEBUG_MODE:
         'afmngr': "640484db11324cef2b6b24d2",
         'media': "640484d2b0f7e9d9e06e4617",
         'gambleuac_gambleppc': "647e3969f8ecd50ecf48e3bf",
-        'masons_partners': "64da0c1ba5021e8081341910"
+        'mt_partners': "64da0c1ba5021e8081341910"
     }
     card_labels_creo = {
         'admin': "63f13a1d58e626baa8577a1b",
@@ -56,7 +56,7 @@ else:
         'afmngr': "63ab08faaf2cb403e4f5516b",
         'media': "6404832e79e458c4683a9c77",
         'gambleuac_gambleppc': "647e383b9a078c0f54f34754",
-        'masons_partners': "64da0c7e54116f260b35ee32"
+        'mt_partners': "64da0c7e54116f260b35ee32"
     }
     card_labels_creo = {
         'admin': "63886c84a055ba018fd0f714",
@@ -127,11 +127,15 @@ def create_card_tech(card, owner_dep, owner_name, date=""):
 
 # create card 2
 def create_card_creo(card, owner_dep, owner_name, date):
+
+    # add label if user is not mt_partners
+    mt_dep = [] if owner_name == 'mt_partners' else [card_labels_creo['mt_partners']]
+
     query = {
         'idList': idList_creo,
         'name': card.name,
         'desc': card.desc,
-        'idLabels': [card_labels_creo[owner_dep], owner_name],
+        'idLabels': [card_labels_creo[owner_dep], owner_name] + mt_dep,
         'due': date,
     }
 
