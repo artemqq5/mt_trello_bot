@@ -1438,8 +1438,7 @@ async def masons_partners(message):
                             ),
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech,
-                            date=dateTime,
-                            is_masons_partners=True
+                            date=dateTime
                         )
                         update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
