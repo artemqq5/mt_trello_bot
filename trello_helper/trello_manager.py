@@ -107,17 +107,13 @@ def create_label(name, type_board):
 
 
 # create card 1
-def create_card_tech(card, owner_dep, owner_name, date="", is_masons_partners=False):
-
-    list_labels = [card_labels_tech[owner_dep], owner_name,
-                             card_labels_tech['masons_partners']] if is_masons_partners else [
-        card_labels_tech[owner_dep], owner_name, ]
+def create_card_tech(card, owner_dep, owner_name, date=""):
 
     query = {
         'idList': idList_tech,
         'name': card.name,
         'desc': card.desc,
-        'idLabels': list_labels,
+        'idLabels': [card_labels_tech[owner_dep], owner_name, ],
         'due': date
     }
 
