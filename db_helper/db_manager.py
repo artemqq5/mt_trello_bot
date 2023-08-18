@@ -25,7 +25,7 @@ def connect_db():
 
 
 # add user to db
-def add_user(user):
+def add_user_db(user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
@@ -41,7 +41,7 @@ def add_user(user):
 
 
 # delete user from tb
-def delete_user(id_user):
+def delete_user_db(id_user):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
@@ -56,7 +56,7 @@ def delete_user(id_user):
 
 
 # return a user by his chat.id
-def get_user(user_id):
+def get_user_db(user_id):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
@@ -81,7 +81,7 @@ def get_user(user_id):
         return ResultData(None, f"error: {e}")
 
 
-def get_list_users():
+def get_list_users_db():
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
@@ -97,7 +97,7 @@ def get_list_users():
         return ResultData(None, f"error: {e}")
 
 
-def add_card(name, desc, tb_name, id_user, id_card='null'):
+def add_card_db(name, desc, tb_name, id_user, id_card='null'):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:
@@ -115,7 +115,7 @@ def add_card(name, desc, tb_name, id_user, id_card='null'):
         return ResultData(None, f"error: {e}")
 
 
-def update_card(id_pk, id_card, tb_name):
+def update_card_db(id_pk, id_card, tb_name):
     try:
         with connect_db() as connection:
             with connection.cursor() as cursor:

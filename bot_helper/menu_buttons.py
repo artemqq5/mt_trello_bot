@@ -2,12 +2,16 @@ import datetime
 
 from telebot import types
 
+# close markup
+close_markup = types.ReplyKeyboardRemove(selective=False)
+
 
 def setStartButton():
     markup = types.ReplyKeyboardMarkup()
 
     listButtons = (
         types.KeyboardButton('Мої Завдання 📋'),
+        # types.KeyboardButton('Creo'),
         types.KeyboardButton('Masons Partners'),
         types.KeyboardButton('Gambling FB'),
         types.KeyboardButton('Gambling PPC'),

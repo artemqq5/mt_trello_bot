@@ -1,22 +1,4 @@
-import datetime
-from telebot import types
-from telebot.types import BotCommand
-
-from bot_helper.af_manager_buttons import *
-from bot_helper.gambling_fb_buttons import *
-from bot_helper.gambling_ppc_buttons import *
-from bot_helper.gambling_uac_buttons import *
-from bot_helper.masons_partners import masons_partners_menu
-from bot_helper.media_buttons import *
-from db_helper.db_manager import *
-from bot_helper.menu_buttons import *
-from messages.const_messages import *
-from models.task_form import *
-from private_config import local_telegram_token, server_telegram_token
-from telebot.async_telebot import AsyncTeleBot
-import asyncio
-
-from trello_helper.trello_manager import *
+from bot_commands.admin_commands import *
 
 # bot settings
 if DEBUG_MODE:
@@ -24,53 +6,12 @@ if DEBUG_MODE:
 else:
     bot = AsyncTeleBot(server_telegram_token)
 
-# states
-modes = {
-    "none",
-    "add_user",
-    "delete_user",
-    "mailing_all",
-
-    "add_offer",
-    "edit_offer",
-
-    "order_creative",
-    "order_creative_gamble",
-    "share_app",
-    "pwa_app",
-    "create_campaign",
-
-    "add_comment",
-
-    "set_domain",
-    "setting_cloak",
-    "prepare_vait",
-
-    "media_other_task",
-    "masons_partners",
-}
-
-user_state = "none"
-
-# dep states
-dep_states = {"admin", "gambleppc", "gambleuac", "gamblefb", "afmngr", "media", "gambleuac_gambleppc", "tech",
-              "mt_partners"}
-
-# close markup
-close_markup = types.ReplyKeyboardRemove(selective=False)
-
-
-# set operations state 'none'
-def set_state_none():
-    global user_state
-    user_state = "none"
-
 
 # send start text for user COMMAND
 @bot.message_handler(commands=['start'])
 async def start_message(message):
     set_state_none()  # reset user state
-
+    #
     # await bot.set_my_commands(
     #     commands=[
     #         BotCommand("/start", "Меню"),
@@ -79,37 +20,28 @@ async def start_message(message):
     #         BotCommand("/mailing_all", "Розсилка всім"),
     #         BotCommand("/get_all", "Показати всіх користувачів")])
 
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         await bot.send_message(message.chat.id, 'Меню', reply_markup=setStartButton())
     else:
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-# management user (add, delete)
+# management user (add, delete, mailing)
 @bot.message_handler(commands=['add_user', 'delete_user', 'mailing_all'])
 async def menu_(message):
-    global user_state
     set_state_none()  # reset user state
 
-    if get_user(message.chat.id).result is not None:
-        if get_user(message.chat.id).result.dep_user == "admin":
+    if get_user_db(message.chat.id).result is not None:
+        if get_user_db(message.chat.id).result.dep_user == "admin":
             if message.text == '/add_user':
-                user_state = "add_user"
-                await bot.send_message(
-                    message.chat.id,
-                    INPUT_USER_ADD,
-                    reply_markup=close_markup
-                )
+                user_state["state"] = "add_user"
+                await bot.send_message(message.chat.id, INPUT_USER_ADD, reply_markup=close_markup)
             elif message.text == '/delete_user':
-                user_state = "delete_user"
+                user_state["state"] = "delete_user"
                 await bot.send_message(message.chat.id, INPUT_USER_ID, reply_markup=close_markup)
             elif message.text == '/mailing_all':
-                user_state = "mailing_all"
-                await bot.send_message(
-                    message.chat.id,
-                    MAIL_TO_ALL,
-                    reply_markup=close_markup
-                )
+                user_state["state"] = "mailing_all"
+                await bot.send_message(message.chat.id, MAIL_TO_ALL, reply_markup=close_markup)
         else:
             await bot.send_message(message.chat.id, NOT_ACCESS, reply_markup=close_markup)
     else:
@@ -117,107 +49,57 @@ async def menu_(message):
 
 
 @bot.message_handler(commands=['get_all'])
-async def show_all(message):
-    global user_state
-    set_state_none()  # reset user state
-
-    if get_user(message.chat.id).result is not None:
-        if get_user(message.chat.id).result.dep_user == "admin":
-            try:
-                result = get_list_users()
-                listUsers = ""
-                for user in result.result:
-                    listUsers += f"{user['id_user']} | {user['name_user']} | {user['dep_user']}\n"
-                await bot.send_message(
-                    message.chat.id,
-                    listUsers,
-                    reply_markup=close_markup)
-            except Exception as e:
-                print(e)
-                await bot.send_message(message.chat.id, ERROR_OPERATION, reply_markup=close_markup)
+async def get_all(message):
+    if get_user_db(message.chat.id).result is not None:
+        if get_user_db(message.chat.id).result.dep_user == "admin":
+            await get_all_command(message, bot)
         else:
             await bot.send_message(message.chat.id, NOT_ACCESS, reply_markup=close_markup)
     else:
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
+    # reset user state
+    set_state_none()
 
-@bot.message_handler(func=lambda m: user_state in ("add_user", "delete_user"))
-async def user_delete_add(message):
-    if get_user(message.chat.id).result is not None:
-        if user_state == "add_user":
-            listDataUser = message.text.split(" ")
-            if len(listDataUser) == 3:
-                if listDataUser[2] in dep_states:
-                    if get_user(listDataUser[0]).result is not None:
-                        set_state_none()  # reset user state
-                        await bot.reply_to(message, USER_ALREADY_HAVE, reply_markup=setStartButton())
-                    else:
-                        if add_user(User(
-                                listDataUser[0],
-                                listDataUser[1],
-                                listDataUser[2],
-                                create_label(listDataUser[1], "tech")["id"],
-                                create_label(listDataUser[1], "creo")["id"])).result:
-                            set_state_none()  # reset user state
-                            await bot.reply_to(message, USER_ADDED, reply_markup=setStartButton())
-                        else:
-                            await bot.reply_to(message, '')
-                else:
-                    await bot.reply_to(message, f'{HAVE_NOT_DEP} {tuple(dep_states)} :')
-            else:
-                await bot.reply_to(message, INPUT_USER_ADD_ERROR)
-        elif user_state == "delete_user":
-            if get_user(message.text).result is not None:
-                set_state_none()  # reset user state
 
-                if delete_user(message.text).result:
-                    await bot.reply_to(message, USER_DELETED, reply_markup=setStartButton())
-                else:
-                    await bot.reply_to(
-                        message,
-                        ERROR_DELETE_USER,
-                        reply_markup=setStartButton()
-                    )
-            else:
-                await bot.reply_to(message, USER_HAVE_NOT_IN_DB)
+@bot.message_handler(func=lambda m: user_state["state"] == "add_user")
+async def add_user(message):
+    if get_user_db(message.chat.id).result is not None:
+        await add_user_command(message, bot)
+    else:
+        await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
+
+    # reset user state
+    set_state_none()
+
+
+@bot.message_handler(func=lambda m: user_state["state"] == "delete_user")
+async def delete_user(message):
+    if get_user_db(message.chat.id).result is not None:
+        # delete user from bot
+        await delete_user_command(message, bot)
     else:
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "mailing_all")
+@bot.message_handler(func=lambda m: user_state["state"] == "mailing_all")
 async def user_mailing(message):
-    set_state_none()  # reset user state
-
-    if get_user(message.chat.id).result is not None:
-        users = get_list_users()
-        unsuccessful = 0
-
-        for i in users.result:
-            try:
-                if i['id_user'] != str(message.chat.id):
-                    await bot.send_message(i['id_user'], message.text)
-                else:
-                    unsuccessful += 1
-            except Exception as e:
-                print(f"mailing all error for user {i}: {e}")
-                unsuccessful += 1
-
-        await bot.reply_to(
-            message,
-            f"📬 Успішно доставлено {len(users.result) - unsuccessful} користувачам з {len(users.result)}",
-            reply_markup=setStartButton()
-        )
+    if get_user_db(message.chat.id).result is not None:
+        await mailing_all_command(message, bot)
     else:
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
+
+    # reset user_state
+    set_state_none()
 
 
 @bot.message_handler(
     func=lambda m: m.text in (
-    "Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Media", "Мої Завдання 📋", "Masons Partners"))
+            "Gambling FB", "Gambling PPC", "Gambling UAC", "AF Manager", "Media", "Мої Завдання 📋", "Masons Partners"))
 async def choice_category(message):
     set_state_none()  # reset user state
 
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         match message.text:
             case "AF Manager":
                 await bot.send_message(message.chat.id, message.text + ": ", reply_markup=af_manager_menu())
@@ -239,9 +121,9 @@ async def choice_category(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "add_offer")
+@bot.message_handler(func=lambda m: user_state["state"] == "add_offer")
 async def offer_add(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100:
             match task_step["step"]:
                 case 0:
@@ -296,8 +178,8 @@ async def offer_add(message):
                                 f"Промо посилання: {model_task_list['promo_link']}\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Add offer by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -314,7 +196,7 @@ async def offer_add(message):
                             owner_name=current_user.result.label_tech
                         )
 
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -328,9 +210,9 @@ async def offer_add(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "edit_offer")
+@bot.message_handler(func=lambda m: user_state["state"] == "edit_offer")
 async def offer_edit(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100:
             match task_step["step"]:
                 case 0:
@@ -347,8 +229,8 @@ async def offer_edit(message):
                                 f"Задача : {model_task_list['desc_offer']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Edit offer by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -365,7 +247,7 @@ async def offer_edit(message):
                             owner_name=current_user.result.label_tech
                         )
 
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -379,9 +261,9 @@ async def offer_edit(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "order_creative")
+@bot.message_handler(func=lambda m: user_state["state"] == "order_creative")
 async def order_creo(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] in (4, 8):
             match task_step["step"]:
                 case 0:
@@ -460,8 +342,8 @@ async def order_creo(message):
                                     f"Опис додатково : \n{model_task_list['desc']}\n\n" \
                                     f"Зв'язок у тг: @{message.chat.username}\n"
 
-                        current_user = get_user(message.chat.id)
-                        result_add_to_db = add_card(
+                        current_user = get_user_db(message.chat.id)
+                        result_add_to_db = add_card_db(
                             f"Order Creative by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_creo",
@@ -479,7 +361,7 @@ async def order_creo(message):
                                 date=dateTime
                             )
 
-                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
+                            update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
                             add_attachments_to_card(
                                 card_id=card_id.json()['id'],
@@ -523,9 +405,9 @@ async def order_creo(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "order_creative_gamble")
+@bot.message_handler(func=lambda m: user_state["state"] == "order_creative_gamble")
 async def order_creo_gamble(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] in (3, 4, 12, 13, 14):
             match task_step["step"]:
                 case 0:
@@ -688,8 +570,8 @@ async def order_creo_gamble(message):
                                     f"Опис : \n{model_task_list['desc']}\n{sub_desc}\n" \
                                     f"Зв'язок у тг: @{message.chat.username}\n"
 
-                        current_user = get_user(message.chat.id)
-                        result_add_to_db = add_card(
+                        current_user = get_user_db(message.chat.id)
+                        result_add_to_db = add_card_db(
                             f"Order Creative by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_creo",
@@ -706,7 +588,7 @@ async def order_creo_gamble(message):
                                 owner_name=current_user.result.label_creo,
                                 date=dateTime
                             )
-                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
+                            update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
                             add_attachments_to_card(
                                 card_id=card_id.json()['id'],
@@ -750,9 +632,9 @@ async def order_creo_gamble(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "media_other_task")
+@bot.message_handler(func=lambda m: user_state["state"] == "media_other_task")
 async def media_other_task(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] in (3,):
             match task_step["step"]:
                 case 0:
@@ -808,8 +690,8 @@ async def media_other_task(message):
                                     f"Опис : \n{model_task_list['desc']}\n\n" \
                                     f"Зв'язок у тг: @{message.chat.username}\n"
 
-                        current_user = get_user(message.chat.id)
-                        result_add_to_db = add_card(
+                        current_user = get_user_db(message.chat.id)
+                        result_add_to_db = add_card_db(
                             f"Media Other by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_creo",
@@ -826,7 +708,7 @@ async def media_other_task(message):
                                 owner_name=current_user.result.label_creo,
                                 date=dateTime
                             )
-                            update_card(result_add_to_db['id'], card.json()['id'], "cards_creo")
+                            update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
                             if card_id.ok:
                                 await bot.send_message(
@@ -865,9 +747,9 @@ async def media_other_task(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "share_app")
+@bot.message_handler(func=lambda m: user_state["state"] == "share_app")
 async def share_app(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] == 2:
             match task_step["step"]:
                 case 0:
@@ -891,8 +773,8 @@ async def share_app(message):
                                 f"Опис : \n{model_task_list['desc']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Share app by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -908,7 +790,7 @@ async def share_app(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND, reply_markup=setStartButton())
                     else:
                         await bot.send_message(
@@ -922,9 +804,9 @@ async def share_app(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "other_task")
+@bot.message_handler(func=lambda m: user_state["state"] == "other_task")
 async def other_task(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] == 1:
             match task_step["step"]:
                 case 0:
@@ -954,8 +836,8 @@ async def other_task(message):
                         desc_card = f"{model_task_list['desc']}\n\n" \
                                     f"Зв'язок у тг: @{message.chat.username}\n"
 
-                        current_user = get_user(message.chat.id)
-                        result_add_to_db = add_card(
+                        current_user = get_user_db(message.chat.id)
+                        result_add_to_db = add_card_db(
                             f"custom_task by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_tech",
@@ -972,7 +854,7 @@ async def other_task(message):
                                 owner_name=current_user.result.label_tech,
                                 date=dateTime
                             )
-                            update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                            update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                             await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                    reply_markup=setStartButton())
                         else:
@@ -995,9 +877,9 @@ async def other_task(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "pwa_app")
+@bot.message_handler(func=lambda m: user_state["state"] == "pwa_app")
 async def pwa_(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100 or task_step["step"] == 2:
             match task_step["step"]:
                 case 0:
@@ -1033,8 +915,8 @@ async def pwa_(message):
                                     f"Опис : {model_task_list['desc']}\n\n" \
                                     f"Зв'язок у тг: @{message.chat.username}\n"
 
-                        current_user = get_user(message.chat.id)
-                        result_add_to_db = add_card(
+                        current_user = get_user_db(message.chat.id)
+                        result_add_to_db = add_card_db(
                             f"PWA by ({current_user.result.name_user})",
                             f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                             "cards_tech",
@@ -1051,7 +933,7 @@ async def pwa_(message):
                                 owner_name=current_user.result.label_tech,
                                 date=dateTime
                             )
-                            update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                            update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                             await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                    reply_markup=setStartButton())
                         else:
@@ -1075,9 +957,9 @@ async def pwa_(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "add_comment")
+@bot.message_handler(func=lambda m: user_state["state"] == "add_comment")
 async def add_comment(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         try:
             if write_comment(id_card=model_task_list["current_card"], text=message.text):
                 await bot.send_message(
@@ -1098,9 +980,9 @@ async def add_comment(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "create_campaign")
+@bot.message_handler(func=lambda m: user_state["state"] == "create_campaign")
 async def create_campaign(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         if len(message.text) < 100:
             match task_step["step"]:
                 case 0:
@@ -1114,8 +996,8 @@ async def create_campaign(message):
                                 f"Додаток : {model_task_list['app_name']}\n\n" \
                                 f"Зв'язок у тг : @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Create campaign by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -1131,7 +1013,7 @@ async def create_campaign(message):
                             owner_dep=current_user.result.dep_user,
                             owner_name=current_user.result.label_tech,
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1148,9 +1030,9 @@ async def create_campaign(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "set_domain")
+@bot.message_handler(func=lambda m: user_state["state"] == "set_domain")
 async def set_domain(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         match task_step["step"]:
             case 0:
                 model_task_list['offer_names'] = message.text
@@ -1182,8 +1064,8 @@ async def set_domain(message):
                                 f"Опис : {model_task_list['desc']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Park domain by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -1200,7 +1082,7 @@ async def set_domain(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1222,9 +1104,9 @@ async def set_domain(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "setting_cloak")
+@bot.message_handler(func=lambda m: user_state["state"] == "setting_cloak")
 async def setting_cloak(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         match task_step["step"]:
             case 0:
                 model_task_list['geo'] = message.text
@@ -1265,8 +1147,8 @@ async def setting_cloak(message):
                                 f"Опис : {model_task_list['desc']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Setting cloak by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -1283,7 +1165,7 @@ async def setting_cloak(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1305,9 +1187,9 @@ async def setting_cloak(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "prepare_vait")
+@bot.message_handler(func=lambda m: user_state["state"] == "prepare_vait")
 async def prepare_vait(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         match task_step["step"]:
             case 0:
                 model_task_list['geo'] = message.text
@@ -1347,8 +1229,8 @@ async def prepare_vait(message):
                                 f"Опис : {model_task_list['desc']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         f"Prepare vait by ({current_user.result.name_user})",
                         f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         "cards_tech",
@@ -1365,7 +1247,7 @@ async def prepare_vait(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1387,9 +1269,9 @@ async def prepare_vait(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state == "masons_partners")
+@bot.message_handler(func=lambda m: user_state["state"] == "masons_partners")
 async def masons_partners(message):
-    if get_user(message.chat.id).result is not None:
+    if get_user_db(message.chat.id).result is not None:
         match task_step["step"]:
             case 0:
                 model_task_list['name'] = message.text
@@ -1422,8 +1304,8 @@ async def masons_partners(message):
                     desc_card = f"Опис : {model_task_list['desc']}\n\n" \
                                 f"Зв'язок у тг: @{message.chat.username}\n"
 
-                    current_user = get_user(message.chat.id)
-                    result_add_to_db = add_card(
+                    current_user = get_user_db(message.chat.id)
+                    result_add_to_db = add_card_db(
                         name=f"Masons Partners by ({current_user.result.name_user})",
                         desc=f"{datetime.datetime.today().strftime('%Y-%m-%d %H:%M')}",
                         tb_name="cards_tech",
@@ -1440,7 +1322,7 @@ async def masons_partners(message):
                             owner_name=current_user.result.label_tech,
                             date=dateTime
                         )
-                        update_card(result_add_to_db['id'], card.json()['id'], "cards_tech")
+                        update_card_db(result_add_to_db['id'], card.json()['id'], "cards_tech")
                         await bot.send_message(message.chat.id, MESSAGE_SEND,
                                                reply_markup=setStartButton())
                     else:
@@ -1467,18 +1349,17 @@ async def masons_partners(message):
         "my_task_creo", "my_task_tech", "standard_creo", "gambling_creo", "other_media",
         "masons_partners"))
 async def answer(call):
-    global user_state
     set_state_none()  # reset user state
 
     reset_task_list()
 
-    current_user = get_user(call.from_user.id).result
+    current_user = get_user_db(call.from_user.id).result
 
     if current_user is not None:
         match call.data:
             case "edit_offer":
                 if current_user.dep_user in ("afmngr", "admin"):
-                    user_state = "edit_offer"
+                    user_state["state"] = "edit_offer"
                     await bot.send_message(
                         call.from_user.id,
                         "Id оффера у трекері : ",
@@ -1491,7 +1372,7 @@ async def answer(call):
                     )
             case "add_offer":
                 if current_user.dep_user in ("afmngr", "admin"):
-                    user_state = "add_offer"
+                    user_state["state"] = "add_offer"
                     await bot.send_message(
                         call.from_user.id,
                         "Новий рекламодавець чи існуючий?",
@@ -1512,7 +1393,7 @@ async def answer(call):
                         )
 
                     else:
-                        user_state = "order_creative"
+                        user_state["state"] = "order_creative"
 
                         await bot.send_message(
                             call.from_user.id,
@@ -1526,7 +1407,7 @@ async def answer(call):
                     )
             case "standard_creo":
                 if current_user.dep_user != "afmngr":
-                    user_state = "order_creative"
+                    user_state["state"] = "order_creative"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1541,7 +1422,7 @@ async def answer(call):
 
             case "gambling_creo":
                 if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc"):
-                    user_state = "order_creative_gamble"
+                    user_state["state"] = "order_creative_gamble"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1556,7 +1437,7 @@ async def answer(call):
                     )
             case "share_app":
                 if current_user.dep_user in ("gamblefb", "gambleuac", "admin", "gambleuac_gambleppc"):
-                    user_state = "share_app"
+                    user_state["state"] = "share_app"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1570,7 +1451,7 @@ async def answer(call):
                     )
             case "other_task":
                 if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin", "gambleuac_gambleppc"):
-                    user_state = "other_task"
+                    user_state["state"] = "other_task"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1584,7 +1465,7 @@ async def answer(call):
                     )
             case "pwa_app":
                 if current_user.dep_user in ("gamblefb", "gambleuac", "admin", "gambleuac_gambleppc"):
-                    user_state = "pwa_app"
+                    user_state["state"] = "pwa_app"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1598,7 +1479,7 @@ async def answer(call):
                     )
             case "create_campaign":
                 if current_user.dep_user in ("gamblefb", "gambleuac", "gambleppc", "admin", "gambleuac_gambleppc"):
-                    user_state = "create_campaign"
+                    user_state["state"] = "create_campaign"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1612,7 +1493,7 @@ async def answer(call):
                     )
             case "set_domain":
                 if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
-                    user_state = "set_domain"
+                    user_state["state"] = "set_domain"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1626,7 +1507,7 @@ async def answer(call):
                     )
             case "setting_cloak":
                 if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
-                    user_state = "setting_cloak"
+                    user_state["state"] = "setting_cloak"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1640,7 +1521,7 @@ async def answer(call):
                     )
             case "prepare_vait":
                 if current_user.dep_user in ("gambleppc", "admin", "gambleuac_gambleppc"):
-                    user_state = "prepare_vait"
+                    user_state["state"] = "prepare_vait"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1654,7 +1535,7 @@ async def answer(call):
                     )
             case "other_media":
                 if current_user.dep_user in ("media", "admin"):
-                    user_state = "media_other_task"
+                    user_state["state"] = "media_other_task"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1681,7 +1562,7 @@ async def answer(call):
                     await bot.send_message(call.from_user.id, "Ваші завдання tech : ", reply_markup=creo_tasks.markup)
             case "masons_partners":
                 if current_user.dep_user in ("mt_partners", "admin"):
-                    user_state = "masons_partners"
+                    user_state["state"] = "masons_partners"
 
                     await bot.send_message(
                         call.from_user.id,
@@ -1700,7 +1581,6 @@ async def answer(call):
 
 @bot.callback_query_handler(func=lambda call: call.data in get_callback_cards() + ["delete_card", "commend_card"])
 async def answer_cards(call):
-    global user_state
     set_state_none()  # reset user state
 
     match call.data:
@@ -1713,7 +1593,7 @@ async def answer_cards(call):
             except:
                 pass
         case "commend_card":
-            user_state = "add_comment"
+            user_state["state"] = "add_comment"
 
             await bot.send_message(
                 call.from_user.id,
