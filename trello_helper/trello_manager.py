@@ -116,7 +116,6 @@ def create_label(name, type_board):
 
 # create card 1
 def create_card_tech(card, labels, date=""):
-
     query = {
         'idList': idList_tech,
         'name': card.name,
@@ -135,7 +134,6 @@ def create_card_tech(card, labels, date=""):
 
 # create card 2
 def create_card_creo(card, labels, date, list_creo):
-
     query = {
         'idList': list_creo,
         'name': card.name,
@@ -190,7 +188,11 @@ def get_tasks(type, userlabel):
 
 
 def get_callback_cards():
-    tasks_l = clientTrelloApi.get_list(idList_tech).list_cards() + clientTrelloApi.get_list(id_creo_gambling).list_cards()
+    tech_tasks = clientTrelloApi.get_list(idList_tech).list_cards()
+    gambling_creo_tasks = clientTrelloApi.get_list(id_creo_gambling).list_cards()
+    crypto_creo_tasks = clientTrelloApi.get_list(id_creo_crypto).list_cards()
+    media_creo_tasks = clientTrelloApi.get_list(id_creo_media).list_cards()
+    tasks_l = tech_tasks + gambling_creo_tasks + crypto_creo_tasks + media_creo_tasks
     list_callback = []
     for card in tasks_l:
         list_callback.append(f"card_{card.id}")
