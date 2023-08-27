@@ -64,7 +64,7 @@ async def menu_(message):
     set_state_none()  # reset user state
 
     if get_user_db(message.chat.id).result is not None:
-        if get_user_db(message.chat.id).result.dep_user == "admin":
+        if get_user_db(message.chat.id).result.dep_user in ("admin", "designer", "tech"):
             if message.text == '/add_user':
                 user_state["state"] = "add_user"
                 await bot.send_message(message.chat.id, INPUT_USER_ADD, reply_markup=close_markup)
@@ -83,7 +83,7 @@ async def menu_(message):
 @bot.message_handler(commands=['get_all'])
 async def get_all(message):
     if get_user_db(message.chat.id).result is not None:
-        if get_user_db(message.chat.id).result.dep_user == "admin":
+        if get_user_db(message.chat.id).result.dep_user in ("admin", "designer", "tech"):
             await get_all_command(message, bot)
         else:
             await bot.send_message(message.chat.id, NOT_ACCESS, reply_markup=close_markup)
@@ -94,7 +94,7 @@ async def get_all(message):
     set_state_none()
 
 
-@bot.message_handler(func=lambda m: user_state["state"] == "add_user")
+@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
 async def add_user(message):
     if get_user_db(message.chat.id).result is not None:
         await add_user_command(message, bot)
@@ -105,7 +105,7 @@ async def add_user(message):
     set_state_none()
 
 
-@bot.message_handler(func=lambda m: user_state["state"] == "delete_user")
+@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
 async def delete_user(message):
     if get_user_db(message.chat.id).result is not None:
         # delete user from bot
@@ -114,7 +114,7 @@ async def delete_user(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state["state"] == "mailing_all")
+@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
 async def user_mailing(message):
     if get_user_db(message.chat.id).result is not None:
         await mailing_all_command(message, bot)
@@ -348,7 +348,7 @@ async def answer_creo(call):
     current_user = get_user_db(call.from_user.id).result
 
     if current_user is not None:
-        if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc"):
+        if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc", "designer"):
             match call.data:
                 case "crypto_new" | "crypto_adaptive":
                     user_state["state"] = "order_creative_crypto"
