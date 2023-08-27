@@ -5,12 +5,12 @@ from telebot import types
 def af_manager_menu():
     markup = types.InlineKeyboardMarkup()
 
-    listButtons = (
+    list_buttons = (
         types.InlineKeyboardButton('Редагувати оффер 🔧', callback_data="edit_offer"),
         types.InlineKeyboardButton('Додати оффер ➕', callback_data="add_offer"),
     )
 
-    for i in listButtons:
+    for i in list_buttons:
         markup.add(i)
 
     return markup

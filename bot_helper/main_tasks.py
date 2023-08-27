@@ -1,26 +1,19 @@
-import datetime
-
 from telebot import types
 
 # close markup
 close_markup = types.ReplyKeyboardRemove(selective=False)
 
 
-def setStartButton():
+def set_start_button():
     markup = types.ReplyKeyboardMarkup()
 
-    listButtons = (
-        types.KeyboardButton('Мої Завдання 📋'),
-        # types.KeyboardButton('Creo'),
-        types.KeyboardButton('Masons Partners'),
-        types.KeyboardButton('Gambling FB'),
-        types.KeyboardButton('Gambling PPC'),
-        types.KeyboardButton('Gambling UAC'),
-        types.KeyboardButton('AF Manager'),
-        types.KeyboardButton('Media'),
+    list_buttons = (
+        types.KeyboardButton('My Tasks 📋'),
+        types.KeyboardButton('Creo'),
+        types.KeyboardButton('Tech'),
     )
 
-    for i in listButtons:
+    for i in list_buttons:
         markup.add(i)
 
     return markup
@@ -63,31 +56,8 @@ def choice_date():
 
 
 def skip_desc():
-    return types.ReplyKeyboardMarkup().add(types.KeyboardButton('Пропустити'))
+    return types.ReplyKeyboardMarkup().add(types.KeyboardButton("Пропустити"))
 
 
 def yes_no():
     return types.ReplyKeyboardMarkup().row(types.KeyboardButton('Так'), types.KeyboardButton('Ні'))
-
-
-def plash_google_apple():
-    markup = types.ReplyKeyboardMarkup()
-
-    markup.row(types.KeyboardButton('Google'), types.KeyboardButton('Apple'))
-    markup.add(types.KeyboardButton('Google и Apple'))
-
-    return markup
-
-
-def choice_type_creo():
-    markup = types.InlineKeyboardMarkup()
-
-    listButtons = (
-        types.InlineKeyboardButton('Стандарт', callback_data="standard_creo"),
-        types.InlineKeyboardButton('Gambling', callback_data="gambling_creo"),
-    )
-
-    for i in listButtons:
-        markup.add(i)
-
-    return markup
