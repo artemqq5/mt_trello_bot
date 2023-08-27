@@ -16,8 +16,12 @@ if DEBUG_MODE:
     #####
     idBoard_tech = "63dee8451b098dbb297364ce"
     idBoard_creo = "63f1382831806175541ec243"
+    #
     idList_tech = "63dee8451b098dbb297364d5"
-    idList_creo = "63f13834e8cccb4aadd9df57"
+    #
+    id_creo_gambling = "63f13834e8cccb4aadd9df57"
+    id_creo_crypto = "64eb6b37aec7a55bd9fd6bc2"
+    id_creo_media = "64eb6b4080bd717b3ff45ed4"
     # cards label
     card_labels_tech = {
         'admin': "63f11b61964c04a585f18843",
@@ -45,8 +49,12 @@ else:
     #####
     idBoard_tech = "63453d2e8f5c5c00831d85e7"
     idBoard_creo = "633c5216d400ad00dfdc62c4"
+    #
     idList_tech = "63454557e3731b04b58bf1b0"
-    idList_creo = "633c563d00d9d7030833c807"
+    #
+    id_creo_gambling = "633c563d00d9d7030833c807"
+    id_creo_crypto = "63e4c48fe326d4c6ff077e03"
+    id_creo_media = "64d4e1d3a8aa75b8d306c40c"
     # cards label
     card_labels_tech = {
         'admin': "634eba07598e200171c9c440",
@@ -107,13 +115,12 @@ def create_label(name, type_board):
 
 
 # create card 1
-def create_card_tech(card, owner_dep, owner_name, date=""):
-
+def create_card_tech(card, labels, date=""):
     query = {
         'idList': idList_tech,
         'name': card.name,
         'desc': card.desc,
-        'idLabels': [card_labels_tech[owner_dep], owner_name, ],
+        'idLabels': labels,
         'due': date
     }
 
@@ -126,16 +133,12 @@ def create_card_tech(card, owner_dep, owner_name, date=""):
 
 
 # create card 2
-def create_card_creo(card, owner_dep, owner_name, date):
-
-    # add label if user is not mt_partners
-    mt_dep = [] if owner_name == 'mt_partners' else [card_labels_creo['mt_partners']]
-
+def create_card_creo(card, labels, date, list_creo):
     query = {
-        'idList': idList_creo,
+        'idList': list_creo,
         'name': card.name,
         'desc': card.desc,
-        'idLabels': [card_labels_creo[owner_dep], owner_name] + mt_dep,
+        'idLabels': labels,
         'due': date,
     }
 
@@ -164,8 +167,14 @@ def add_attachments_to_card(card_id, source):
 
 
 # get all tasks
-def get_tasks(typeListId, userlabel):
-    tasks_l = clientTrelloApi.get_list(typeListId).list_cards()
+def get_tasks(type, userlabel):
+    if type == "creo":
+        gambling_tasks = clientTrelloApi.get_list(id_creo_gambling).list_cards()
+        crypto_tasks = clientTrelloApi.get_list(id_creo_crypto).list_cards()
+        media_tasks = clientTrelloApi.get_list(id_creo_media).list_cards()
+        tasks_l = gambling_tasks + crypto_tasks + media_tasks
+    else:
+        tasks_l = clientTrelloApi.get_list(idList_tech).list_cards()
     markup = types.InlineKeyboardMarkup()
     for card in tasks_l:
         for label in card.idLabels:
@@ -173,13 +182,17 @@ def get_tasks(typeListId, userlabel):
                 markup.add(types.InlineKeyboardButton(card.name, callback_data=f"card_{card.id}"))
 
     if len(markup.to_dict()['inline_keyboard']) == 0:
-        return TaskResult("У вас нет активных заданий")
+        return TaskResult("У вас немає активних завдань")
     else:
-        return TaskResult("Успешно", markup)
+        return TaskResult("Успішно", markup)
 
 
 def get_callback_cards():
-    tasks_l = clientTrelloApi.get_list(idList_tech).list_cards() + clientTrelloApi.get_list(idList_creo).list_cards()
+    tech_tasks = clientTrelloApi.get_list(idList_tech).list_cards()
+    gambling_creo_tasks = clientTrelloApi.get_list(id_creo_gambling).list_cards()
+    crypto_creo_tasks = clientTrelloApi.get_list(id_creo_crypto).list_cards()
+    media_creo_tasks = clientTrelloApi.get_list(id_creo_media).list_cards()
+    tasks_l = tech_tasks + gambling_creo_tasks + crypto_creo_tasks + media_creo_tasks
     list_callback = []
     for card in tasks_l:
         list_callback.append(f"card_{card.id}")
