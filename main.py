@@ -348,7 +348,8 @@ async def answer_creo(call):
     current_user = get_user_db(call.from_user.id).result
 
     if current_user is not None:
-        if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc", "designer"):
+        if current_user.dep_user in ("gambleppc", "gambleuac", "gamblefb", "admin", "gambleuac_gambleppc",
+                                     "designer", "media"):
             match call.data:
                 case "crypto_new" | "crypto_adaptive":
                     user_state["state"] = "order_creative_crypto"
