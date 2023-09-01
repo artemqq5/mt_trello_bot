@@ -94,7 +94,7 @@ async def get_all(message):
     set_state_none()
 
 
-@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
+@bot.message_handler(func=lambda m: user_state["state"] == "add_user")
 async def add_user(message):
     if get_user_db(message.chat.id).result is not None:
         await add_user_command(message, bot)
@@ -105,7 +105,7 @@ async def add_user(message):
     set_state_none()
 
 
-@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
+@bot.message_handler(func=lambda m: user_state["state"] == "delete_user")
 async def delete_user(message):
     if get_user_db(message.chat.id).result is not None:
         # delete user from bot
@@ -114,7 +114,7 @@ async def delete_user(message):
         await bot.send_message(message.chat.id, NOT_REGISTERED_USER, reply_markup=close_markup)
 
 
-@bot.message_handler(func=lambda m: user_state["state"] in ("admin", "designer", "tech"))
+@bot.message_handler(func=lambda m: user_state["state"] == "mailing_all")
 async def user_mailing(message):
     if get_user_db(message.chat.id).result is not None:
         await mailing_all_command(message, bot)
