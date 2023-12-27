@@ -145,12 +145,12 @@ async def order_gambling_creative(message, bot):
                 if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                     date_time = datetime.datetime.strptime(
                         datetime.datetime.now().strftime("%Y-%m-%d") +
-                        " " + message.text.split(" ")[1] + " +0400", '%Y-%m-%d %H:%M %z') \
+                        " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
                                 + datetime.timedelta(days=1)
                 elif message.text == SKIP:
                     date_time = ""
                 else:
-                    date_time = datetime.datetime.strptime(message.text + " +0400", '%Y-%m-%d %H:%M %z')
+                    date_time = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
 
                 if model_task_list['count'] > 1:
                     sub_desc = f"\n{model_task_list['sub_desc']}\n"
