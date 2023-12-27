@@ -5,42 +5,40 @@ from trello import TrelloClient
 import requests
 
 from config import DEBUG_MODE
-from private_config import local_secret_trello, local_token_trello, local_api_key_trello, server_api_key_trello, \
-    server_token_trello, server_secret_trello
+from private_config import server_api_key_trello, server_token_trello, server_secret_trello
 
 # key, token, secret key
 if DEBUG_MODE:
-    API_KEY_TRELLO = local_api_key_trello
-    TOKEN_TRELLO = local_token_trello
-    API_SECRET_TRELLO = local_secret_trello
+    API_KEY_TRELLO = server_api_key_trello
+    TOKEN_TRELLO = server_token_trello
+    API_SECRET_TRELLO = server_secret_trello
     #####
-    idBoard_tech = "63dee8451b098dbb297364ce"
-    idBoard_creo = "63f1382831806175541ec243"
+    idBoard_tech = "657349bfd5dd7da8739e6058"  # the same
+    idBoard_creo = "657349bfd5dd7da8739e6058"  # the same
     #
-    idList_tech = "63dee8451b098dbb297364d5"
+    idList_tech = "658bdfb79109634c42cdfb7c"
     #
-    id_creo_gambling = "63f13834e8cccb4aadd9df57"
-    id_creo_crypto = "64eb6b37aec7a55bd9fd6bc2"
-    id_creo_media = "64eb6b4080bd717b3ff45ed4"
+    id_creo_new = "658bddfabd1bbd024833641c"
     # cards label
     card_labels_tech = {
-        'admin': "63f11b61964c04a585f18843",
-        'gambleppc': "6404850165d7ef9e460e4ff5",
-        'gambleuac': "640484f407dd03c70ac1e6e4",
-        'gamblefb': "640484eb648168166b969afc",
-        'afmngr': "640484db11324cef2b6b24d2",
-        'media': "640484d2b0f7e9d9e06e4617",
-        'gambleuac_gambleppc': "647e3969f8ecd50ecf48e3bf",
-        'mt_partners': "64da0c1ba5021e8081341910"
+        'admin': "658be00755bc04065d2f97e3",
+        'gambleppc': "658be1eb7716db4de92082e7",
+        'gambleuac': "658be1f3dbf8ba3d96034010",
+        'gamblefb': "658be1fbcc224c23f824165b",
+        'afmngr': "658be203472d643a8835230c",
+        'media': "658be20d9945e2fbaace5b6b",
+        'gambleuac_gambleppc': "658be21423314a72eba3188f",
+        'mt_partners': "658be21ebddcbb8049622ebb"
     }
     card_labels_creo = {
-        'admin': "63f13a1d58e626baa8577a1b",
-        'gambleppc': "6404843d6537b1e009267ff9",
-        'gambleuac': "6404844caf2ec97c635166cb",
-        'gamblefb': "64048456b3fa400da1d5e145",
-        'afmngr': "6404846d85bbd09e92d1f715",
-        'media': "64048477f9e3e14232c3430b",
-        'gambleuac_gambleppc': "647e39146cdf6e588a62f2d6",
+        'admin': "658be00755bc04065d2f97e3",
+        'gambleppc': "658be1eb7716db4de92082e7",
+        'gambleuac': "658be1f3dbf8ba3d96034010",
+        'gamblefb': "658be1fbcc224c23f824165b",
+        'afmngr': "658be203472d643a8835230c",
+        'media': "658be20d9945e2fbaace5b6b",
+        'gambleuac_gambleppc': "658be21423314a72eba3188f",
+        'mt_partners': "658be21ebddcbb8049622ebb"
     }
 else:
     API_KEY_TRELLO = server_api_key_trello
@@ -52,9 +50,7 @@ else:
     #
     idList_tech = "63454557e3731b04b58bf1b0"
     #
-    id_creo_gambling = "633c563d00d9d7030833c807"
-    id_creo_crypto = "63e4c48fe326d4c6ff077e03"
-    id_creo_media = "64d4e1d3a8aa75b8d306c40c"
+    id_creo_new = "656ee887fd55c6e59e4a0df8"
     # cards label
     card_labels_tech = {
         'admin': "634eba07598e200171c9c440",
@@ -133,9 +129,9 @@ def create_card_tech(card, labels, date=""):
 
 
 # create card 2
-def create_card_creo(card, labels, date, list_creo):
+def create_card_creo(card, labels, date):
     query = {
-        'idList': list_creo,
+        'idList': id_creo_new,
         'name': card.name,
         'desc': card.desc,
         'idLabels': labels,
@@ -169,10 +165,7 @@ def add_attachments_to_card(card_id, source):
 # get all tasks
 def get_tasks(type, userlabel):
     if type == "creo":
-        gambling_tasks = clientTrelloApi.get_list(id_creo_gambling).list_cards()
-        crypto_tasks = clientTrelloApi.get_list(id_creo_crypto).list_cards()
-        media_tasks = clientTrelloApi.get_list(id_creo_media).list_cards()
-        tasks_l = gambling_tasks + crypto_tasks + media_tasks
+        tasks_l = clientTrelloApi.get_list(id_creo_new).list_cards()
     else:
         tasks_l = clientTrelloApi.get_list(idList_tech).list_cards()
     markup = types.InlineKeyboardMarkup()
@@ -189,10 +182,8 @@ def get_tasks(type, userlabel):
 
 def get_callback_cards():
     tech_tasks = clientTrelloApi.get_list(idList_tech).list_cards()
-    gambling_creo_tasks = clientTrelloApi.get_list(id_creo_gambling).list_cards()
-    crypto_creo_tasks = clientTrelloApi.get_list(id_creo_crypto).list_cards()
-    media_creo_tasks = clientTrelloApi.get_list(id_creo_media).list_cards()
-    tasks_l = tech_tasks + gambling_creo_tasks + crypto_creo_tasks + media_creo_tasks
+    creo_tasks = clientTrelloApi.get_list(id_creo_new).list_cards()
+    tasks_l = tech_tasks + creo_tasks
     list_callback = []
     for card in tasks_l:
         list_callback.append(f"card_{card.id}")

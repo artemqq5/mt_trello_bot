@@ -7,8 +7,7 @@ from db_helper.db_manager import get_user_db, add_card_db, update_card_db
 from messages.const_messages import SKIP, TIME_CHOICE, MESSAGE_SEND, MESSAGE_DONT_SEND, WRONG_TIME_CHOICE, \
     ERROR_OPERATION
 from models.task_form import task_step, model_task_list, set_task_step
-from trello_helper.trello_manager import create_card_creo, TrelloCard, add_attachments_to_card, card_labels_creo, \
-    id_creo_gambling
+from trello_helper.trello_manager import create_card_creo, TrelloCard, add_attachments_to_card, card_labels_creo
 
 
 async def order_gambling_creative(message, bot):
@@ -146,12 +145,12 @@ async def order_gambling_creative(message, bot):
                 if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                     date_time = datetime.datetime.strptime(
                         datetime.datetime.now().strftime("%Y-%m-%d") +
-                        " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                        " " + message.text.split(" ")[1] + " +0400", '%Y-%m-%d %H:%M %z') \
                                 + datetime.timedelta(days=1)
                 elif message.text == SKIP:
                     date_time = ""
                 else:
-                    date_time = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+                    date_time = datetime.datetime.strptime(message.text + " +0400", '%Y-%m-%d %H:%M %z')
 
                 if model_task_list['count'] > 1:
                     sub_desc = f"\n{model_task_list['sub_desc']}\n"
@@ -189,7 +188,6 @@ async def order_gambling_creative(message, bot):
                         ),
                         labels=[current_user.result.label_creo, card_labels_creo[current_user.result.dep_user]],
                         date=date_time,
-                        list_creo=id_creo_gambling
                     )
                     update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 
@@ -297,7 +295,6 @@ async def order_gambling_creative_adaptive(message, bot):
                         ),
                         labels=[current_user.result.label_creo, card_labels_creo[current_user.result.dep_user]],
                         date=date_time,
-                        list_creo=id_creo_gambling
                     )
                     update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 

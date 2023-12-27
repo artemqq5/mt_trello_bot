@@ -1,13 +1,12 @@
 import datetime
 
 from bot_commands.state_managment import set_state_none
-from bot_helper.creo_categories.media_other import choice_source_media, account_or_app_media
-from bot_helper.main_tasks import skip_desc, close_markup, choice_date, set_start_button
+from bot_helper.main_tasks import skip_desc,  choice_date, set_start_button
 from db_helper.db_manager import get_user_db, add_card_db, update_card_db
 from messages.const_messages import SKIP, TIME_CHOICE, MESSAGE_SEND, MESSAGE_DONT_SEND, WRONG_TIME_CHOICE, \
     ERROR_OPERATION
 from models.task_form import task_step, model_task_list, set_task_step
-from trello_helper.trello_manager import create_card_creo, TrelloCard, card_labels_creo, id_creo_media
+from trello_helper.trello_manager import create_card_creo, TrelloCard, card_labels_creo
 
 
 async def order_media_creative(message, bot):
@@ -52,12 +51,12 @@ async def order_media_creative(message, bot):
                 if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                     date_time = datetime.datetime.strptime(
                         datetime.datetime.now().strftime("%Y-%m-%d") +
-                        " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                        " " + message.text.split(" ")[1] + " +0400", '%Y-%m-%d %H:%M %z') \
                                 + datetime.timedelta(days=1)
                 elif message.text == SKIP:
                     date_time = ""
                 else:
-                    date_time = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+                    date_time = datetime.datetime.strptime(message.text + " +0400", '%Y-%m-%d %H:%M %z')
 
                 desc_card = f"Кількість : {model_task_list['amount_creo']}\n" \
                             f"Розмір у пікселях або роздільна здатність : {model_task_list['px_size']}\n\n" \
@@ -80,7 +79,6 @@ async def order_media_creative(message, bot):
                         ),
                         labels=[current_user.result.label_creo, card_labels_creo[current_user.result.dep_user]],
                         date=date_time,
-                        list_creo=id_creo_media
                     )
                     update_card_db(result_add_to_db['id'], card.json()['id'], "cards_creo")
 

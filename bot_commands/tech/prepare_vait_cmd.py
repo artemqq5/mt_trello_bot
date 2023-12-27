@@ -35,12 +35,12 @@ async def prepare_vait_cmd(message, bot):
                 if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                     date_time = datetime.datetime.strptime(
                         datetime.datetime.now().strftime("%Y-%m-%d") +
-                        " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                        " " + message.text.split(" ")[1] + " +0400", '%Y-%m-%d %H:%M %z') \
                                 + datetime.timedelta(days=1)
                 elif message.text == SKIP:
                     date_time = ""
                 else:
-                    date_time = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+                    date_time = datetime.datetime.strptime(message.text + " +0400", '%Y-%m-%d %H:%M %z')
 
                 desc_card = f"Гео : {model_task_list['geo']}\n" \
                             f"Джерело : {model_task_list['source']}\n\n" \
