@@ -29,12 +29,12 @@ async def set_domain_cmd(message, bot):
                 if message.text in ("Завтра 12:00", "Завтра 15:00", "Завтра 18:00"):
                     date_time = datetime.datetime.strptime(
                         datetime.datetime.now().strftime("%Y-%m-%d") +
-                        " " + message.text.split(" ")[1] + " +0300", '%Y-%m-%d %H:%M %z') \
+                        " " + message.text.split(" ")[1] + " +0200", '%Y-%m-%d %H:%M %z') \
                                 + datetime.timedelta(days=1)
                 elif message.text == SKIP:
                     date_time = ""
                 else:
-                    date_time = datetime.datetime.strptime(message.text + " +0300", '%Y-%m-%d %H:%M %z')
+                    date_time = datetime.datetime.strptime(message.text + " +0200", '%Y-%m-%d %H:%M %z')
 
                 desc_card = f"Назви доменів : {model_task_list['offer_names']}\n\n" \
                             f"Опис : {model_task_list['desc']}\n\n" \
