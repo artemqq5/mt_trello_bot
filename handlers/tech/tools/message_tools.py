@@ -1,7 +1,7 @@
 from repository.model.trello_card import TrelloCard
 
 
-def parse_to_trello_card_format_tech(id_, task_tech, task_type, user):
+def parse_to_trello_card_format_tech(id_, task_tech, task_type, user, user_tg):
     desk = ""
 
     for param in task_tech:
@@ -9,7 +9,7 @@ def parse_to_trello_card_format_tech(id_, task_tech, task_type, user):
             desk += f"{param}: {task_tech[param]}\n"
 
     desk += "\n"
-    desk += f"username: @{user.name}\n"
+    desk += f"username: @{user_tg}\n"
     desk += f"telegram id: {user.id}\n"
 
     trello_card = TrelloCard(

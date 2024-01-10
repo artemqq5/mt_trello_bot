@@ -45,7 +45,7 @@ async def send_order_creo(data, message):
 
         if add_task_db is not None:
             task = CardRepository().get_card_creo(add_task_db)
-            trello_card = parse_to_trello_card_format_creo(task, user)
+            trello_card = parse_to_trello_card_format_creo(task, user, user_tg=message.chat.username)
             add_terello = TrelloRepository().create_card_creo(trello_card,
                                                               [user.label_creo, card_labels_creo[user.dep]])
             if add_terello is not None:

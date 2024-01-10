@@ -14,7 +14,7 @@ def check_view_order(order_params: dict[str, str]) -> str:
     return formated_order
 
 
-def parse_to_trello_card_format_creo(task_creo, user):
+def parse_to_trello_card_format_creo(task_creo, user, user_tg):
     desk = ""
 
     for i in task_creo:
@@ -23,7 +23,7 @@ def parse_to_trello_card_format_creo(task_creo, user):
                 desk += f"{i}: {task_creo[i]}\n"
 
     desk += "\n"
-    desk += f"username: @{user.name}\n"
+    desk += f"username: @{user_tg}\n"
     desk += f"telegram id: {user.id}\n"
 
     trello_card = TrelloCard(

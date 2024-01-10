@@ -33,7 +33,7 @@ async def send_order_tech(data, message, type_):
             add_task_db = None
 
         if add_task_db is not None:
-            trello_card = parse_to_trello_card_format_tech(id_=add_task_db, task_tech=data, task_type=type_, user=user)
+            trello_card = parse_to_trello_card_format_tech(id_=add_task_db, task_tech=data, task_type=type_, user=user, user_tg=message.chat.username)
             add_terello = TrelloRepository().create_card_tech(trello_card, [user.label_tech, card_labels_tech[user.dep]])
             if add_terello is not None:
                 json_card = add_terello.json()
