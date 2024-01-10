@@ -26,13 +26,11 @@ class StateEditOffer(StatesGroup):
 
 
 class StateMTPartners(StatesGroup):
-    name = State()
     desc = State()
     deadline = State()
 
 
 class StateOtherTask(StatesGroup):
-    name = State()
     desc = State()
     deadline = State()
 

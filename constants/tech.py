@@ -71,11 +71,9 @@ INPUT_DESC = "Введіть опис, що зробити:"
 #
 
 # MT PARTNERS
-INPUT_NAME_TASK = "Введіть назву для таску:"
 # DESC -- already have --
 
 # OTHER TASK
-# NAME_TASK -- already have --
 # DESC -- already have --
 #
 
@@ -88,7 +86,7 @@ INPUT_TECHNICAL_TASK = "Введіть ТЗ/посилання на ТЗ:"
 
 # PWA
 # GEO -- already have --
-# NAME_TASK -- already have --
+# INPUT_APP_NAME -- already have --
 # DESC -- already have --
 #
 

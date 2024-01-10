@@ -4,8 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from _keyboard.base_keyboard import cancel_keyboard, skip_keyboard
-from constants.base import NOT_ACCESS, SKIP, WRONG_TIME_CHOICE
-from constants.creo import DEADLINE_MESSAGE
+from constants.base import NOT_ACCESS, SKIP, WRONG_TIME_CHOICE, DEADLINE_MESSAGE
 from constants.tech import *
 from handlers.tech.state_tech.tech_states import StateTechTask, StatePrepareVait
 from handlers.tech.tools.send_task import send_order_tech

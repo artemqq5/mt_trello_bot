@@ -4,8 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from _keyboard.base_keyboard import cancel_keyboard, skip_keyboard
-from constants.base import NOT_ACCESS, SKIP, WRONG_TIME_CHOICE
-from constants.creo import DEADLINE_MESSAGE
+from constants.base import NOT_ACCESS, SKIP, WRONG_TIME_CHOICE, DEADLINE_MESSAGE
 from constants.tech import *
 from handlers.tech.state_tech.tech_states import StateTechTask, StateCreatePWA
 from handlers.tech.tools.send_task import send_order_tech
@@ -33,7 +32,7 @@ async def start_create_pwa(message: types.Message):
 async def set_geo_pwa(message: types.Message, state: FSMContext):
     await state.update_data(geo=message.text)
     await StateCreatePWA.name.set()
-    await message.answer(INPUT_NAME_TASK)
+    await message.answer(INPUT_APP_NAME)
 
 
 async def set_name_pwa(message: types.Message, state: FSMContext):
