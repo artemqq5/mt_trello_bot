@@ -5,6 +5,7 @@ from aiogram.types import Message
 from _keyboard.base_keyboard import cancel_keyboard, skip_keyboard
 from _keyboard.creo_keyboard.creo_keyboard import design_type_keyboard, design_category_keyboard, \
     design_category_finance_keyboard, design_app_platform_keyboard, design_format_keyboard
+from constants.base import DEADLINE_MESSAGE
 from constants.creo import *
 from handlers.creo.state_creo.creo_states import StateOrderCreo, StateAppCreo, StateDefaultCreo, StateOtherCreo
 
