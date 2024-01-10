@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from _keyboard.base_keyboard import dep_keyboard
+from _keyboard.base_keyboard import dep_keyboard, menu_keyboard
 from constants.base import CHOICE_DEP_USER, NOT_ACCESS, ERROR_OPERATION, ALL_DEP, LIST_IS_EMPTY
 from constants.dep import ADMIN_, DEP_LIST
 from handlers.admin.states_admin.admin_states import StateGetAllUsers
@@ -34,8 +34,8 @@ async def get_all_cmd(message: types.Message, state: FSMContext):
         for user in users:
             dep = f"<b>Dep:</b> {user.dep}\n\n" if message.text == ALL_DEP else "\n"
             forrmated += f"<b>ID:</b> {user.id}\n<b>Name:</b> {user.name}\n{dep}"
-        await message.answer(forrmated)
+        await message.answer(forrmated, reply_markup=menu_keyboard())
     else:
-        await message.answer(LIST_IS_EMPTY)
+        await message.answer(LIST_IS_EMPTY, reply_markup=menu_keyboard())
 
     await state.finish()

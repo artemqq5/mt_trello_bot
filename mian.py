@@ -23,6 +23,7 @@ from handlers.creo.default_ import register_default_creo_handlers
 from handlers.creo.other_ import register_other_creo_handlers
 from handlers.creo.start_order import register_order_creo_handlers
 from handlers.creo.state_creo.creo_states import StateOrderCreo
+from handlers.my_task.my_task_handler import register_my_task_handler
 from handlers.tech.add_offer import register_add_offer_tech_handler
 from handlers.tech.campaign_ import register_create_campaign_tech_handler
 from handlers.tech.edit_offer import register_edit_offer_tech_handler
@@ -66,6 +67,7 @@ async def _menu(message: types.Message):
     user = get_user_model(UserRepository().get_user(message.chat.id))
 
     if message.text == MY_TASK:
+
         pass
     elif message.text == CREO:
         if user.dep in DEP_CREO_ACCESS:
@@ -104,6 +106,9 @@ register_pwa_tech_handler(dispatcher)
 register_domain_tech_handler(dispatcher)
 register_cloak_tech_handler(dispatcher)
 register_share_app_tech_handler(dispatcher)
+
+# register_my_task_handlers
+register_my_task_handler(dispatcher)
 
 if __name__ == '__main__':
     executor.start_polling(dispatcher=dispatcher, skip_updates=True)
