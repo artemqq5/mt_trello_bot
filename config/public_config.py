@@ -1,7 +1,7 @@
 from config import private_config
 from constants.dep import *
 
-is_development = False
+is_development = True
 
 # the same
 API_KEY_TRELLO = private_config._api_key_trello

@@ -8,11 +8,13 @@ from aiogram.utils import executor
 
 from _keyboard.base_keyboard import menu_keyboard
 from _keyboard.creo_keyboard.creo_keyboard import design_format_keyboard
+from _keyboard.my_task.my_task_keyboard import choose_tasks_keyboard
 from _keyboard.tech_keyboard.tech_keyboard import tech_format_keyboard
 from config.public_config import BOT_TOKEN
 from constants.base import *
 from constants.creo import DESIGN_FORMAT
-from constants.dep import DEP_CREO_ACCESS, DEP_TECH_ACCESS
+from constants.dep import DEP_CREO_ACCESS, DEP_TECH_ACCESS, DEP_MY_TASK_ACCESS
+from constants.my_task import MANAGMENT_TASK_
 from constants.tech import TECH_FORMAT
 from handlers.admin.add_ import add_admin_handlers
 from handlers.admin.delete_ import delte_admin_handlers
@@ -24,6 +26,7 @@ from handlers.creo.other_ import register_other_creo_handlers
 from handlers.creo.start_order import register_order_creo_handlers
 from handlers.creo.state_creo.creo_states import StateOrderCreo
 from handlers.my_task.my_task_handler import register_my_task_handler
+from handlers.my_task.state_my_task.my_task_states import StateMyTaskManage
 from handlers.tech.add_offer import register_add_offer_tech_handler
 from handlers.tech.campaign_ import register_create_campaign_tech_handler
 from handlers.tech.edit_offer import register_edit_offer_tech_handler
@@ -67,8 +70,11 @@ async def _menu(message: types.Message):
     user = get_user_model(UserRepository().get_user(message.chat.id))
 
     if message.text == MY_TASK:
-
-        pass
+        if user.dep in DEP_MY_TASK_ACCESS:
+            await StateMyTaskManage.start_manage.set()
+            await message.answer(MANAGMENT_TASK_, reply_markup=choose_tasks_keyboard())
+        else:
+            await message.answer(NOT_ACCESS)
     elif message.text == CREO:
         if user.dep in DEP_CREO_ACCESS:
             await StateOrderCreo.format_creo.set()

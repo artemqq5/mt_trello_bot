@@ -46,3 +46,13 @@ class CardRepository(MyConnection):
         command = "UPDATE `cards_tech` SET `id_card` = %s, `url` = %s WHERE `id` = %s;"
         args = (card_id_trello, url_card, id_)
         return self._update(command, args)
+
+    def get_card_creo_by_card_id(self, id_):
+        command = "SELECT * FROM `cards_creo` WHERE `id_card` = %s;"
+        args = (id_, )
+        return self._select_one(command, args)
+
+    def get_card_tech_by_card_id(self, id_):
+        command = "SELECT * FROM `cards_tech` WHERE `id_card` = %s;"
+        args = (id_, )
+        return self._select_one(command, args)
