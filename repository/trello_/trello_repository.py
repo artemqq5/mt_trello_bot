@@ -40,5 +40,5 @@ class TrelloRepository(TrelloManager):
     def write_comment(self, id_card, text):
         return self._write_comment(id_card, text)
 
-    def set_webhook(self, card_id):
-        return self._set_webhook_card(card_id)
+    def set_webhook(self, card_id, vertical):
+        return self._set_webhook_card(card_id, vertical)

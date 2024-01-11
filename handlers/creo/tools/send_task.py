@@ -2,7 +2,7 @@ import datetime
 
 from _keyboard.base_keyboard import menu_keyboard
 from config.public_config import card_labels_creo
-from constants.base import MESSAGE_SEND, MESSAGE_DONT_SEND
+from constants.base import MESSAGE_SEND, MESSAGE_DONT_SEND, CREO
 from constants.dep import ADMIN_
 from handlers.creo.tools.message_tools import parse_to_trello_card_format_creo
 from handlers.creo.tools.notify_creo import notify_new_creo
@@ -50,7 +50,7 @@ async def send_order_creo(data, message):
                                                               [user.label_creo, card_labels_creo[user.dep]])
             if add_terello is not None:
                 json_card = add_terello.json()
-                TrelloRepository().set_webhook(json_card['id'])  # set webhook
+                TrelloRepository().set_webhook(json_card['id'], CREO)  # set webhook
                 CardRepository().update_card_creo(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
                                                   id_=add_task_db)
                 await notify_new_creo(message, trello_card, json_card['shortUrl'])

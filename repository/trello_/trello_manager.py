@@ -109,11 +109,11 @@ class TrelloManager:
             params={'text': text} | self.__default_body
         )
 
-    def _set_webhook_card(self, card_id):
+    def _set_webhook_card(self, card_id, vertical):
         query = {
             'callbackURL': f'{HOSTENAME_}/webhook',
             'idModel': card_id,
-            'description': f'webhook_card_{card_id}'
+            'description': f'{vertical}_webhook_card_{card_id}'
         }
 
         return requests.post(
