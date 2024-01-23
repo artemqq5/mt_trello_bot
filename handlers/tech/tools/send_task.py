@@ -33,17 +33,24 @@ async def send_order_tech(data, message, type_):
             add_task_db = None
 
         if add_task_db is not None:
-            trello_card = parse_to_trello_card_format_tech(id_=add_task_db, task_tech=data, task_type=type_, user=user, user_tg=message.chat.username)
-            add_terello = TrelloRepository().create_card_tech(trello_card, [user.label_tech, card_labels_tech[user.dep]])
-            if add_terello is not None:
-                json_card = add_terello.json()
-                TrelloRepository().set_webhook(json_card['id'], TECH)  # set webhook
-                CardRepository().update_card_tech(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
-                                                  id_=add_task_db)
-                await notify_new_tech(message, trello_card, json_card['shortUrl'])
-                await message.answer(f"{MESSAGE_SEND}", reply_markup=menu_keyboard())
-            else:
+            try:
+                trello_card = parse_to_trello_card_format_tech(id_=add_task_db, task_tech=data, task_type=type_,
+                                                               user=user, user_tg=message.chat.username)
+                add_terello = TrelloRepository().create_card_tech(trello_card,
+                                                                  [user.label_tech, card_labels_tech[user.dep]])
+                if add_terello is not None:
+                    json_card = add_terello.json()
+                    TrelloRepository().set_webhook(json_card['id'], TECH)  # set webhook
+                    CardRepository().update_card_tech(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
+                                                      id_=add_task_db)
+                    await notify_new_tech(message, trello_card, json_card['shortUrl'])
+                    await message.answer(f"{MESSAGE_SEND}", reply_markup=menu_keyboard())
+                else:
+                    await message.answer(MESSAGE_DONT_SEND, reply_markup=menu_keyboard())
+            except Exception as e:
+                print(f"error send_order_tech: {e}")
                 await message.answer(MESSAGE_DONT_SEND, reply_markup=menu_keyboard())
+
         else:
             await message.answer(MESSAGE_DONT_SEND, reply_markup=menu_keyboard())
     else:
