@@ -33,7 +33,7 @@ async def add_user_cmd(message: types.Message, state: FSMContext):
             if UserRepository().get_user(data_user[0]) is None:
                 user = UserModel(id_user=data_user[0], name_user=data_user[1], dep_user=data_user[2],
                                  label_creo=TrelloRepository().create_label_creo(data_user[1]),
-                                 label_tech=TrelloRepository().create_label_creo(data_user[1]))
+                                 label_tech=TrelloRepository().create_label_tech(data_user[1]))
 
                 if UserRepository().add_user(user) is not None:
                     await state.finish()
