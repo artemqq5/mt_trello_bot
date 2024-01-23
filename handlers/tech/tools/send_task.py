@@ -38,7 +38,7 @@ async def send_order_tech(data, message, type_):
                                                                user=user, user_tg=message.chat.username)
                 add_terello = TrelloRepository().create_card_tech(trello_card,
                                                                   [user.label_tech, card_labels_tech[user.dep]])
-                if add_terello is not None:
+                if add_terello.content:
                     json_card = add_terello.json()
                     TrelloRepository().set_webhook(json_card['id'], TECH)  # set webhook
                     CardRepository().update_card_tech(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],

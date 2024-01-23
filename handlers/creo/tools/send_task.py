@@ -49,7 +49,7 @@ async def send_order_creo(data, message):
                 trello_card = parse_to_trello_card_format_creo(task, user, user_tg=message.chat.username)
                 add_terello = TrelloRepository().create_card_creo(trello_card,
                                                                   [user.label_creo, card_labels_creo[user.dep]])
-                if add_terello is not None:
+                if add_terello.content:
                     json_card = add_terello.json()
                     TrelloRepository().set_webhook(json_card['id'], CREO)  # set webhook
                     CardRepository().update_card_creo(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
