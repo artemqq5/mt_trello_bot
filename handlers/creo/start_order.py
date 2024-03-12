@@ -1,13 +1,15 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from aiogram.types import Message
+from aiogram.utils.exceptions import MessageIsTooLong
 
 from _keyboard.base_keyboard import cancel_keyboard, skip_keyboard
 from _keyboard.creo_keyboard.creo_keyboard import design_type_keyboard, design_category_keyboard, \
-    design_category_finance_keyboard, design_app_platform_keyboard, design_format_keyboard
-from constants.base import DEADLINE_MESSAGE
+    design_category_finance_keyboard, design_app_platform_keyboard, design_format_keyboard, check_task_view_keyboard
+from constants.base import DEADLINE_MESSAGE, MESSAGE_IS_TOO_LONG
 from constants.creo import *
 from handlers.creo.state_creo.creo_states import StateOrderCreo, StateAppCreo, StateDefaultCreo, StateOtherCreo
+from handlers.creo.tools.message_tools import check_view_order
 
 
 def register_order_creo_handlers(dispatcher):
@@ -103,5 +105,16 @@ async def check_order_task(message: types.Message, state: FSMContext):
                 await message.answer(DEADLINE_MESSAGE, reply_markup=skip_keyboard())
     else:
         await state.finish()
+        await StateOrderCreo.format_creo.set()
+        await message.answer(DESIGN_FORMAT, reply_markup=design_format_keyboard())
+
+
+async def check_size_message_creo(message, task_data, state):
+    try:
+        await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+    except MessageIsTooLong as e:
+        print(f"MessageIsTooLong error: ({e}) for {message.chat.id}")
+        await message.answer(MESSAGE_IS_TOO_LONG, reply_markup=check_task_view_keyboard())
+        await state.reset_state()
         await StateOrderCreo.format_creo.set()
         await message.answer(DESIGN_FORMAT, reply_markup=design_format_keyboard())

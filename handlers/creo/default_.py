@@ -8,6 +8,7 @@ from _keyboard.creo_keyboard.creo_keyboard import check_task_view_keyboard
 from constants.base import SKIP, WRONG_TIME_CHOICE
 from constants.creo import LANGUAGE_MESSAGE, ADAPTIVE_CREATIVE, CURRENCY_MESSAGE, FORMAT_MESSAGE, OFFER_MESSAGE, \
     VOICE_MESSAGE, SOURCE_MESSAGE, DESCRIPTION_MESSAGE, COUNT_OF_CREO, WRONG_FORMAT_INPUT_CREO, SUB_DESC_FOR_OTHER_CREO
+from handlers.creo.start_order import check_size_message_creo
 from handlers.creo.state_creo.creo_states import StateDefaultCreo
 from handlers.creo.tools.message_tools import check_view_order
 from handlers.creo.tools.send_task import send_order_creo
@@ -122,7 +123,7 @@ async def set_count_default(message: types.Message, state: FSMContext):
         await state.update_data(count=1)
         await StateDefaultCreo.check.set()
         task_data = await state.get_data()
-        await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+        await check_size_message_creo(message, task_data, state)
     else:
         try:
             count = int(message.text)
@@ -133,7 +134,7 @@ async def set_count_default(message: types.Message, state: FSMContext):
             elif count == 1:
                 await StateDefaultCreo.check.set()
                 task_data = await state.get_data()
-                await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+                await check_size_message_creo(message, task_data, state)
             else:
                 await message.answer(WRONG_FORMAT_INPUT_CREO, reply_markup=skip_keyboard())
         except Exception as e:
@@ -145,7 +146,7 @@ async def set_sub_desc_default(message: types.Message, state: FSMContext):
     await state.update_data(sub_description=message.text)
     await StateDefaultCreo.check.set()
     task_data = await state.get_data()
-    await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+    await check_size_message_creo(message, task_data, state)
 
 
 async def set_deadline_default(message: types.Message, state: FSMContext):

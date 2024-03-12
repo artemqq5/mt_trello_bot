@@ -8,6 +8,7 @@ from _keyboard.creo_keyboard.creo_keyboard import check_task_view_keyboard
 from constants.base import SKIP, WRONG_TIME_CHOICE
 from constants.creo import ADAPTIVE_CREATIVE, OFFER_MESSAGE, SOURCE_MESSAGE, DESCRIPTION_MESSAGE, COUNT_OF_CREO, \
     SUB_DESC_FOR_OTHER_CREO, WRONG_FORMAT_INPUT_CREO
+from handlers.creo.start_order import check_size_message_creo
 from handlers.creo.state_creo.creo_states import StateOtherCreo
 from handlers.creo.tools.message_tools import check_view_order
 from handlers.creo.tools.send_task import send_order_creo
@@ -64,7 +65,7 @@ async def set_count_other(message: types.Message, state: FSMContext):
         await state.update_data(count=1)
         await StateOtherCreo.check.set()
         task_data = await state.get_data()
-        await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+        await check_size_message_creo(message, task_data, state)
     else:
         try:
             count = int(message.text)
@@ -75,7 +76,7 @@ async def set_count_other(message: types.Message, state: FSMContext):
             elif count == 1:
                 await StateOtherCreo.check.set()
                 task_data = await state.get_data()
-                await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+                await check_size_message_creo(message, task_data, state)
             else:
                 await message.answer(WRONG_FORMAT_INPUT_CREO, reply_markup=skip_keyboard())
         except Exception as e:
@@ -87,7 +88,7 @@ async def set_sub_desc_other(message: types.Message, state: FSMContext):
     await state.update_data(sub_description=message.text)
     await StateOtherCreo.check.set()
     task_data = await state.get_data()
-    await message.answer(check_view_order(task_data), reply_markup=check_task_view_keyboard())
+    await check_size_message_creo(message, task_data, state)
 
 
 async def set_deadline_other(message: types.Message, state: FSMContext):
