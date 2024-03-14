@@ -30,7 +30,8 @@ if is_development:
         AFMNGR: "658be203472d643a8835230c",
         MEDIA_: "658be20d9945e2fbaace5b6b",
         GAMBLE_UAC_PPC: "658be21423314a72eba3188f",
-        MT_PARTNERS: "658be21ebddcbb8049622ebb"
+        MT_PARTNERS: "658be21ebddcbb8049622ebb",
+        DEV_TECH: "65f2d01ce002749f00e3842a"
     }
     card_labels_creo = {
         ADMIN_: "658be00755bc04065d2f97e3",
@@ -64,6 +65,7 @@ else:
         MEDIA_: "6404832e79e458c4683a9c77",
         GAMBLE_UAC_PPC: "647e383b9a078c0f54f34754",
         MT_PARTNERS: "64da0c7e54116f260b35ee32",
+        DEV_TECH: "65f2d27c51bad73486e51485"
     }
     card_labels_creo = {
         ADMIN_: "63886c84a055ba018fd0f714",

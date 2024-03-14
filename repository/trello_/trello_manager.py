@@ -79,13 +79,17 @@ class TrelloManager:
         return markup
 
     def _get_callback_cards(self):
-        tech_tasks = self.__client.get_list(ID_LIST_TECH).list_cards()
-        creo_tasks = self.__client.get_list(ID_LIST_CREO).list_cards()
-        tasks_l = tech_tasks + creo_tasks
         list_callback = []
-        for card in tasks_l:
-            list_callback.append(f"card_{card.id}")
-        return list_callback
+        try:
+            tech_tasks = self.__client.get_list(ID_LIST_TECH).list_cards()
+            creo_tasks = self.__client.get_list(ID_LIST_CREO).list_cards()
+            tasks_l = tech_tasks + creo_tasks
+            for card in tasks_l:
+                list_callback.append(f"card_{card.id}")
+        except Exception as e:
+            print(f"_get_callvack_cards_trello: {e}")
+        finally:
+            return list_callback
 
     def _get_card(self, id_card):
         card = self.__client.get_card(id_card)
