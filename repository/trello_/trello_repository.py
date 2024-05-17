@@ -22,12 +22,6 @@ class TrelloRepository(TrelloManager):
     def add_attachments_card(self, card_id, source):
         return self._add_attachments_card(card_id, source)
 
-    def get_tasks_creo(self, user_label):
-        return self._get_tasks(CREO, user_label)
-
-    def get_tasks_tech(self, user_label):
-        return self._get_tasks(TECH, user_label)
-
     def get_callback_cards(self):
         return self._get_callback_cards()
 

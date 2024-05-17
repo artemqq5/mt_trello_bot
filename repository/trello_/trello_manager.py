@@ -1,3 +1,4 @@
+import json
 from ast import literal_eval
 
 import requests
@@ -11,12 +12,6 @@ from constants.base import CREO
 class TrelloManager:
 
     def __init__(self):
-        self.__client = TrelloClient(
-            api_key=API_KEY_TRELLO,
-            api_secret=SECRET_TRELLO,
-            token=TOKEN_TRELLO
-        )
-
         self.__url_card = "https://api.trello.com/1/cards"
         self.__url_lebel = "https://api.trello.com/1/labels"
         self.__url_webhook = "https://api.trello.com/1/webhooks/"
@@ -66,34 +61,51 @@ class TrelloManager:
                 params=query | self.__default_body
             )
 
-    def _get_tasks(self, _list, user_label):
-        card_list = ID_LIST_CREO if _list == CREO else ID_LIST_TECH
-        tasks_l = self.__client.get_list(card_list).list_cards()
-
-        markup = types.InlineKeyboardMarkup()
-        for card in tasks_l:
-            for label in card.idLabels:
-                if str(label) == user_label:
-                    markup.add(types.InlineKeyboardButton(card.name, callback_data=f"card_{card.id}"))
-
-        return markup
-
     def _get_callback_cards(self):
         list_callback = []
         try:
-            tech_tasks = self.__client.get_list(ID_LIST_TECH).list_cards()
-            creo_tasks = self.__client.get_list(ID_LIST_CREO).list_cards()
-            tasks_l = tech_tasks + creo_tasks
-            for card in tasks_l:
-                list_callback.append(f"card_{card.id}")
+            url_creo = f"https://api.trello.com/1/lists/{ID_LIST_CREO}/cards"
+            url_tech = f"https://api.trello.com/1/lists/{ID_LIST_TECH}/cards"
+
+            headers = {
+                "Accept": "application/json"
+            }
+
+            query = {
+                'key': API_KEY_TRELLO,
+                'token': TOKEN_TRELLO
+            }
+
+            response_creo = requests.request(
+                "GET",
+                url_creo,
+                headers=headers,
+                params=query
+            )
+
+            response_tech = requests.request(
+                "GET",
+                url_tech,
+                headers=headers,
+                params=query
+            )
+
+            card_ids = [card['id'] for card in response_creo.json() + response_tech.json()]
+
+            for card_id in card_ids:
+                list_callback.append(f"card_{card_id}")
         except Exception as e:
             print(f"_get_callvack_cards_trello: {e}")
         finally:
             return list_callback
 
     def _get_card(self, id_card):
-        card = self.__client.get_card(id_card)
-        return card
+        return requests.request(
+            "GET",
+            url=self.__url_card + f"/{id_card}",
+            headers={"Accept": "application/json"},
+            params=self.__default_body
+        ).json()
 
     def _delete_card(self, id_card):
         return requests.request(

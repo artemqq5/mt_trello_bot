@@ -6,7 +6,6 @@ is_development = True
 # the same
 API_KEY_TRELLO = private_config._api_key_trello
 TOKEN_TRELLO = private_config._token_trello
-SECRET_TRELLO = private_config._secret_trello
 
 if is_development:
     HOSTENAME_ = private_config.test_hostname
