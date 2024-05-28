@@ -28,7 +28,7 @@ def design_type_keyboard() -> ReplyKeyboardMarkup:
 
 
 def design_category_keyboard(category_creo_list) -> InlineKeyboardMarkup:
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 
     for category in category_creo_list:
         keyboard.add(InlineKeyboardButton(text=category, callback_data=category))
@@ -37,7 +37,7 @@ def design_category_keyboard(category_creo_list) -> InlineKeyboardMarkup:
 
 
 def design_category_finance_keyboard() -> InlineKeyboardMarkup:
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 
     for i in FINANCE_CATEGORY_LIST:
         keyboard.add(InlineKeyboardButton(text=i, callback_data=i))

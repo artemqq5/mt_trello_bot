@@ -17,7 +17,7 @@ def choose_tasks_keyboard() -> ReplyKeyboardMarkup:
 
 
 def my_task_creo_callback_keyboard(user) -> InlineKeyboardMarkup:
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 
     all_cards = TrelloRepository().get_callback_cards()
 
@@ -32,7 +32,7 @@ def my_task_creo_callback_keyboard(user) -> InlineKeyboardMarkup:
 
 
 def my_task_tech_callback_keyboard(user) -> InlineKeyboardMarkup:
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardMarkup(resize_keyboard=True)
 
     all_cards = TrelloRepository().get_callback_cards()
 

@@ -16,7 +16,7 @@ def menu_keyboard() -> ReplyKeyboardMarkup:
 
 
 def cancel_keyboard() -> ReplyKeyboardMarkup:
-    markup = ReplyKeyboardMarkup()
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.add(KeyboardButton(CANCEL))
 
@@ -33,7 +33,7 @@ def skip_keyboard() -> ReplyKeyboardMarkup:
 
 
 def dep_keyboard() -> ReplyKeyboardMarkup:
-    markup = ReplyKeyboardMarkup()
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.add(KeyboardButton(ALL_DEP))
 

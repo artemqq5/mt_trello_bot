@@ -6,7 +6,7 @@ from constants.tech import *
 
 
 def tech_format_keyboard(dep) -> ReplyKeyboardMarkup:
-    markup = types.ReplyKeyboardMarkup()
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.add(KeyboardButton(CANCEL))
 
@@ -17,7 +17,7 @@ def tech_format_keyboard(dep) -> ReplyKeyboardMarkup:
 
 
 def tech_advertiser_type_keyboard() -> ReplyKeyboardMarkup:
-    markup = ReplyKeyboardMarkup()
+    markup = ReplyKeyboardMarkup(resize_keyboard=True)
 
     markup.add(KeyboardButton(TYPE_TECH_NEW))
     markup.add(KeyboardButton(TYPE_TECH_EXIST))
