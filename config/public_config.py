@@ -20,6 +20,10 @@ if is_development:
     #
     ID_LIST_TECH = "658bdfb79109634c42cdfb7c"
     ID_LIST_CREO = "658bddfabd1bbd024833641c"
+
+    ID_LIST_TECH_GLEB = "6691678871a5be4f5dd4e689"
+    ID_LIST_TECH_EGOR = "669167941c8f949834c119e8"
+
     # cards label
     card_labels_tech = {
         ADMIN_: "658be00755bc04065d2f97e3",
@@ -54,6 +58,10 @@ else:
     #
     ID_LIST_TECH = "63454557e3731b04b58bf1b0"
     ID_LIST_CREO = "656ee887fd55c6e59e4a0df8"
+
+    ID_LIST_TECH_GLEB = ""
+    ID_LIST_TECH_EGOR = ""
+
     # cards label
     card_labels_tech = {
         ADMIN_: "634eba07598e200171c9c440",

@@ -29,6 +29,7 @@ from handlers.my_task.my_task_handler import register_my_task_handler
 from handlers.my_task.state_my_task.my_task_states import StateMyTaskManage
 from handlers.tech.add_offer import register_add_offer_tech_handler
 from handlers.tech.campaign_ import register_create_campaign_tech_handler
+from handlers.tech.choice_tech import register_choice_tech_handler
 from handlers.tech.edit_offer import register_edit_offer_tech_handler
 from handlers.tech.mt_partners import register_mt_partners_tech_handler
 from handlers.tech.other_ import register_other_tech_handler
@@ -112,6 +113,7 @@ register_pwa_tech_handler(dispatcher)
 register_domain_tech_handler(dispatcher)
 register_cloak_tech_handler(dispatcher)
 register_share_app_tech_handler(dispatcher)
+register_choice_tech_handler(dispatcher)
 
 # register_my_task_handlers
 register_my_task_handler(dispatcher)

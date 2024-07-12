@@ -1,5 +1,6 @@
 from aiogram import types
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.callback_data import CallbackData
 
 from constants.base import CANCEL
 from constants.tech import *
@@ -24,5 +25,11 @@ def tech_advertiser_type_keyboard() -> ReplyKeyboardMarkup:
     markup.add(KeyboardButton(CANCEL))
 
     return markup
+
+
+tech_choice = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=GLEB_TECH, callback_data="ChoiceTechTask:gleb")],
+    [InlineKeyboardButton(text=EGOR_TECH, callback_data="ChoiceTechTask:egor")]
+])
 
 

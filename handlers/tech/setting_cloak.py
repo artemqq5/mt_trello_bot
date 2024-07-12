@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from _keyboard.base_keyboard import cancel_keyboard
+from _keyboard.tech_keyboard.tech_keyboard import tech_choice
 from constants.base import NOT_ACCESS
 from constants.tech import *
 from handlers.tech.state_tech.tech_states import StateTechTask, StateSettingCloak
@@ -48,6 +49,7 @@ async def set_domains_cloak(message: types.Message, state: FSMContext):
 
 async def set_desc_cloak(message: types.Message, state: FSMContext):
     await state.update_data(desc=message.text)
-    data = await state.get_data()
-    await state.finish()
-    await send_order_tech(data=data, message=message, type_=SETTING_CLOAK)
+    await state.update_data(type_task=SETTING_CLOAK)
+
+    await state.set_state(StateTechTask.choice_tech)
+    await message.answer(CHOICE_TECH, reply_markup=tech_choice)

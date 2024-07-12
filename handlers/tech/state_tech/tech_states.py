@@ -3,6 +3,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 class StateTechTask(StatesGroup):
     set_task = State()
+    choice_tech = State()
 
 
 class StateAddOffer(StatesGroup):

@@ -4,6 +4,7 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from _keyboard.base_keyboard import cancel_keyboard, skip_keyboard
+from _keyboard.tech_keyboard.tech_keyboard import tech_choice
 from constants.base import NOT_ACCESS, SKIP, WRONG_TIME_CHOICE, DEADLINE_MESSAGE
 from constants.tech import *
 from handlers.tech.state_tech.tech_states import StateTechTask, StatePrepareVait
@@ -61,18 +62,19 @@ async def set_deadline_vait(message: types.Message, state: FSMContext):
             date_time = datetime.datetime.strptime(message.text + " +0400", '%Y-%m-%d %H:%M %z')
 
             await state.update_data(deadline=str(date_time))
-            data = await state.get_data()
-            await state.finish()
+            await state.update_data(type_task=PREPARE_VAIT)
+
+            await state.set_state(StateTechTask.choice_tech)
+            await message.answer(CHOICE_TECH, reply_markup=tech_choice)
         except Exception as e:
             print(f"set_deadline_vait - {e}")
             data = None
             await message.answer(WRONG_TIME_CHOICE, reply_markup=skip_keyboard())
 
-        await send_order_tech(data=data, message=message, type_=PREPARE_VAIT)
-
     else:
         await state.update_data(deadline=None)
-        data = await state.get_data()
-        await state.finish()
+        await state.update_data(type_task=PREPARE_VAIT)
 
-        await send_order_tech(data=data, message=message, type_=PREPARE_VAIT)
+        await state.set_state(StateTechTask.choice_tech)
+        await message.answer(CHOICE_TECH, reply_markup=tech_choice)
+

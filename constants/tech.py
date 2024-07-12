@@ -110,3 +110,9 @@ INPUT_DOMAINS = "Введіть домени:"
 # APP_NAME -- already have --
 INPUT_ID_CABINETS = "Введіть ID кабінетів:"
 #
+
+CHOICE_TECH = "Оберіть техніка для виконання задачі:"
+GLEB_TECH = "Гліб"
+EGOR_TECH = "Єгор"
+
+

@@ -17,7 +17,7 @@ from repository.user_repository.user_repos import UserRepository
 from repository.user_repository.user_usecase import get_user_model
 
 
-async def send_order_tech(data, message, type_):
+async def send_order_tech(data, message, type_, tech):
     if data is not None:
         user = get_user_model(UserRepository().get_user(message.chat.id))
         try:
@@ -27,6 +27,7 @@ async def send_order_tech(data, message, type_):
                 id_user=user.id,
                 id_card=None,
                 url_card=None,
+                tech=tech
             ))
         except Exception as e:
             print(f"send_order_tech: {e}")
@@ -35,15 +36,18 @@ async def send_order_tech(data, message, type_):
         if add_task_db is not None:
             try:
                 trello_card = parse_to_trello_card_format_tech(id_=add_task_db, task_tech=data, task_type=type_,
-                                                               user=user, user_tg=message.chat.username)
-                add_terello = TrelloRepository().create_card_tech(trello_card,
-                                                                  [user.label_tech, card_labels_tech[user.dep]])
+                                                               user=user, user_tg=message.chat.username, tech=tech)
+                add_terello = TrelloRepository().create_card_tech_v2(
+                    trello_card,
+                    [user.label_tech, card_labels_tech[user.dep]],
+                    tech
+                )
                 if add_terello.content:
                     json_card = add_terello.json()
                     TrelloRepository().set_webhook(json_card['id'], TECH)  # set webhook
                     CardRepository().update_card_tech(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
                                                       id_=add_task_db)
-                    await notify_new_tech(message, trello_card, json_card['shortUrl'])
+                    await notify_new_tech(message, trello_card, json_card['shortUrl'], tech)
                     await message.answer(f"{MESSAGE_SEND}", reply_markup=menu_keyboard())
                 else:
                     await message.answer(MESSAGE_DONT_SEND, reply_markup=menu_keyboard())

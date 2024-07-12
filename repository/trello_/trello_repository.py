@@ -19,6 +19,9 @@ class TrelloRepository(TrelloManager):
     def create_card_tech(self, card, labels):
         return self._create_card(card, labels, TECH)
 
+    def create_card_tech_v2(self, card, labels, tech):
+        return self._create_card_tech(card, labels, tech)
+
     def add_attachments_card(self, card_id, source):
         return self._add_attachments_card(card_id, source)
 

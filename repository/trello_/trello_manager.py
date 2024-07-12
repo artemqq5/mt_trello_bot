@@ -48,6 +48,22 @@ class TrelloManager:
             params=query | self.__default_body
         )
 
+    def _create_card_tech(self, card, labels, tech):
+        query = {
+            'idList': ID_LIST_TECH_GLEB if tech == "gleb" else ID_LIST_TECH_EGOR,
+            'name': card.name,
+            'desc': card.desc,
+            'idLabels': labels,
+            'due': card.date
+        }
+
+        return requests.request(
+            "POST",
+            url=self.__url_card,
+            headers={"Accept": "application/json"},
+            params=query | self.__default_body
+        )
+
     def _add_attachments_card(self, card_id, source):
         for i in source:
             query = {
