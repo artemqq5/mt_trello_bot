@@ -59,8 +59,8 @@ else:
     ID_LIST_TECH = "63454557e3731b04b58bf1b0"
     ID_LIST_CREO = "656ee887fd55c6e59e4a0df8"
 
-    ID_LIST_TECH_GLEB = ""
-    ID_LIST_TECH_EGOR = ""
+    ID_LIST_TECH_GLEB = "6694dfe37ee4e6933c27b2c0"
+    ID_LIST_TECH_EGOR = "6694dfe9678fac0a7745a537"
 
     # cards label
     card_labels_tech = {
