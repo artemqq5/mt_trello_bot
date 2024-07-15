@@ -33,8 +33,8 @@ class CardRepository(MyConnection):
         return self._update(command, args)
 
     def add_card_tech(self, card: CardModelTech):
-        command = "INSERT INTO `cards_tech` (`name`, `date`, `id_user`) VALUES (%s, %s, %s)"
-        args = (card.name, card.date, card.id_user)
+        command = "INSERT INTO `cards_tech` (`name`, `date`, `id_user`, `tech`) VALUES (%s, %s, %s, %s)"
+        args = (card.name, card.date, card.id_user, card.tech)
         return self._insert_id(command, args)
 
     def get_card_tech(self, id_):

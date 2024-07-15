@@ -45,6 +45,8 @@ async def send_order_tech(data, message, type_, tech):
                 if add_terello.content:
                     json_card = add_terello.json()
                     TrelloRepository().set_webhook(json_card['id'], TECH)  # set webhook
+                    print(add_task_db)
+                    print(json_card)
                     CardRepository().update_card_tech(card_id_trello=json_card['id'], url_card=json_card['shortUrl'],
                                                       id_=add_task_db)
                     await notify_new_tech(message, trello_card, json_card['shortUrl'], tech)
