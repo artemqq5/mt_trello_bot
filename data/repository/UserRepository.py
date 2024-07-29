@@ -26,6 +26,6 @@ class UserRepository(DefaultMySQL):
         command = "SELECT * FROM `users` WHERE `dep_user` = %s;"
         return self._select_all(command, (dep,))
 
-    def update_lang(self, user_id, lang):
-        query = "UPDATE `users` SET `lang` = %s WHERE `user_id` = %s;"
-        return self._select_one(query, (lang, user_id))
+    def update_lang(self, id_user, lang):
+        query = "UPDATE `users` SET `lang` = %s WHERE `id_user` = %s;"
+        return self._select_one(query, (lang, id_user))

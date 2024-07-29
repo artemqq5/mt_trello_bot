@@ -103,28 +103,24 @@ dp = Dispatcher(storage=storage)
 
 
 async def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
     bot = Bot(token=private_config.BOT_TOKEN, default=default_properties)
 
-    try:
-        i18n_middleware = I18nMiddleware(
-            core=FluentRuntimeCore(path='presentation/locales'),
-            default_locale='en',
-            manager=LocaleManager()
-        )
+    i18n_middleware = I18nMiddleware(
+        core=FluentRuntimeCore(path='presentation/locales'),
+        default_locale='en',
+        manager=LocaleManager()
+    )
 
-        i18n_middleware.setup(dp)
+    i18n_middleware.setup(dp)
 
-        dp.message.outer_middleware(UserRegistrationMiddleware())  # register if client not registered
-        dp.callback_query.outer_middleware(UserRegistrationMiddleware())  # register if client not registered
+    dp.message.outer_middleware(UserRegistrationMiddleware())  # register if client not registered
+    dp.callback_query.outer_middleware(UserRegistrationMiddleware())  # register if client not registered
 
-        # start bot
-        await bot.delete_webhook(drop_pending_updates=True)
-        await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
-    except Exception as e:
-        print(f"start bot: {e}")
-        return
+    # start bot
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
 
 
 if __name__ == '__main__':
