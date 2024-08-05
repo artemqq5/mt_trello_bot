@@ -22,7 +22,7 @@ class IsRoleMiddleware(BaseMiddleware):
 
         user_id = event.from_user.id
 
-        if not UserRepository().user(user_id)['role'] == self.role:
+        if UserRepository().user(user_id)['dep_user'] not in self.role:
             return
 
         return await handler(event, data)

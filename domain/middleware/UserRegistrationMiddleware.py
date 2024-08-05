@@ -1,7 +1,8 @@
 from typing import Callable, Any, Dict, Awaitable
 
 from aiogram import BaseMiddleware, types
-from aiogram.types import TelegramObject, ReplyKeyboardRemove
+from aiogram.types import TelegramObject
+from aiogram_i18n import L
 
 from data.repository.UserRepository import UserRepository
 
@@ -20,14 +21,14 @@ class UserRegistrationMiddleware(BaseMiddleware):
         tg_user = event.from_user
         current_user = UserRepository().user(tg_user.id)
 
-        if not current_user:
-            if not UserRepository().add(tg_user.id, tg_user.username, tg_user.language_code):
-                await message.answer(text=data['i18n'].REGISTER_FAIL())
-                return None
+        if current_user:
+            if not current_user['username']:
+                UserRepository().update_username(tg_user.id, tg_user.username)
 
-            # notify admin about registration
-            # await NotificationAdmin().user_activate_bot(tg_user.id, event.bot, data['i18n'])
+            if not current_user['firstname']:
+                UserRepository().update_firstname(tg_user.id, tg_user.first_name)
+        else:
+            await message.answer(data['i18n'].ACCESS_DENIED())
+            return None
 
         return await handler(event, data)
-
-

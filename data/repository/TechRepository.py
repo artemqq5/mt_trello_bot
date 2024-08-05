@@ -1,14 +1,14 @@
 from data.DefaultMySQL import DefaultMySQL
 
 
-class TrelloTechRepository(DefaultMySQL):
+class TechRepository(DefaultMySQL):
 
     def __init__(self):
         super().__init__()
 
     def add(self, name, date, id_user, tech):
         command = "INSERT INTO `cards_tech` (`name`, `date`, `id_user`, `tech`) VALUES (%s, %s, %s, %s)"
-        return self._insert_id(command,(name, date, id_user, tech))
+        return self._insert_id(command, (name, date, id_user, tech))
 
     def card(self, id_):
         command = "SELECT * FROM `cards_tech` WHERE `id` = %s;"

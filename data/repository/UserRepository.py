@@ -29,3 +29,23 @@ class UserRepository(DefaultMySQL):
     def update_lang(self, id_user, lang):
         query = "UPDATE `users` SET `lang` = %s WHERE `id_user` = %s;"
         return self._select_one(query, (lang, id_user))
+
+    def update_username(self, id_user, username):
+        query = "UPDATE `users` SET `username` = %s WHERE `id_user` = %s;"
+        return self._select_one(query, (username, id_user))
+
+    def update_firstname(self, id_user, firstname):
+        query = "UPDATE `users` SET `firstname` = %s WHERE `id_user` = %s;"
+        return self._select_one(query, (firstname, id_user))
+
+    #####
+
+    def designers(self):
+        command = "SELECT * FROM `users` WHERE `dep_user` = 'designer';"
+        return self._select_all(command)
+
+    def admins(self):
+        command = "SELECT * FROM `users` WHERE `dep_user` = 'admin';"
+        return self._select_all(command)
+
+
