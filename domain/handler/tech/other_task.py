@@ -10,6 +10,6 @@ from presentation.keyboards.tech.kb_order_tech import kb_choice_category_tech
 
 router = Router()
 
-router.message.middleware(IsRoleMiddleware([ADMIN, ]))
-router.callback_query.middleware(IsRoleMiddleware([ADMIN, ]))
+router.message.middleware(IsRoleMiddleware([ADMIN, GAMBLE_PPC, GAMBLE_FB, GAMBLE_UAC, GAMBLE_UAC_PPC, DEV]))
+router.callback_query.middleware(IsRoleMiddleware([ADMIN, GAMBLE_PPC, GAMBLE_FB, GAMBLE_UAC, GAMBLE_UAC_PPC, DEV]))
 

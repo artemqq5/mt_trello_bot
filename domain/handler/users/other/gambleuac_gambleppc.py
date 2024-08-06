@@ -18,71 +18,35 @@ from presentation.keyboards.tech.kb_order_tech import kb_choice_category_tech
 
 router = Router()
 
-router.include_routers(
-    add_user.router,
-    delete_user.router,
-    get_all.router,
-    mailing_all.router,
-)
-
-router.message.middleware(IsRoleMiddleware((ADMIN,)))
-router.callback_query.middleware(IsRoleMiddleware((ADMIN,)))
+router.message.middleware(IsRoleMiddleware((GAMBLE_UAC_PPC,)))
+router.callback_query.middleware(IsRoleMiddleware((GAMBLE_UAC_PPC,)))
 
 
-@router.message(Command("start"), IsDepFilter((ADMIN,)))
+@router.message(Command("start"), IsDepFilter((GAMBLE_UAC_PPC,)))
 async def start(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await message.answer(i18n.START_ADMIN(), reply_markup=kb_menu_all)
+    await message.answer(i18n.START(), reply_markup=kb_menu_all)
 
 
-@router.message(Command("add_user"))
-async def add_user1(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await state.set_state(AdminSystemState.AddUser)
-    await message.answer(i18n.ADMIN.ADD_USER())
-
-
-@router.message(Command("delete_user"))
-async def delete_user1(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await state.set_state(AdminSystemState.DeleteUser)
-    await message.answer(i18n.ADMIN.DELETE_USER())
-
-
-@router.message(Command("get_all"))
-async def get_all(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await state.set_state(AdminSystemState.GetAll)
-    await message.answer(text=text_users_category(), reply_markup=kb_show_users())
-
-
-@router.message(Command("mailing_all"))
-async def mailing_all1(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await state.set_state(AdminSystemState.MailingAll)
-    await message.answer(i18n.ADMIN.INPUT_TEXT_MAILING())
-
-
-@router.message(F.text == L.TASK_TECH(), IsDepFilter((ADMIN,)))
+@router.message(F.text == L.TASK_TECH(), IsDepFilter((GAMBLE_UAC_PPC,)))
 async def order_tech_start(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await message.answer(i18n.TECH.CHOICE_CATEGORY(), reply_markup=kb_choice_category_tech)
 
 
-@router.message(F.text == L.TASK_AFF(), IsDepFilter((ADMIN,)))
+@router.message(F.text == L.TASK_AFF(), IsDepFilter((GAMBLE_UAC_PPC,)))
 async def order_aff_start(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(OrderAffState.Offer)
     # await message.answer(i18n.TECH.CHOICE_CATEGORY(), reply_markup=kb_choice_category_tech)
 
 
-@router.message(F.text == L.TASK_CREO(), IsDepFilter((ADMIN,)))
+@router.message(F.text == L.TASK_CREO(), IsDepFilter((GAMBLE_UAC_PPC,)))
 async def order_creo_start(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(OrderCreoState.Type)
     await message.answer(i18n.CREO.SET_TYPE(), reply_markup=kb_set_type_creo)
 
 
-@router.callback_query(StartAgainCreo.filter(), OrderCreoState.Preview, IsDepFilter((ADMIN,)))
+@router.callback_query(StartAgainCreo.filter(), OrderCreoState.Preview, IsDepFilter((GAMBLE_UAC_PPC,)))
 async def restart_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nContext):
     await order_creo_start(callback.message, state, i18n)

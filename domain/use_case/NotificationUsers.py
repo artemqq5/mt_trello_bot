@@ -1,4 +1,3 @@
-from aiogram import Bot
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.types import Message, CallbackQuery
 from aiogram_i18n import I18nContext
@@ -21,7 +20,7 @@ class NotificationUsers:
                 counter += 1
             except TelegramForbiddenError as e:
                 block += 1
-                print(f"user({user}) | mailing_users: {e} ")
+                print(f"user({user}) TelegramForbiddenError | mailing_users: {e} ")
             except Exception as e:
                 print(f"user({user}) | mailing_users: {e} ")
                 other += 1
@@ -32,9 +31,6 @@ class NotificationUsers:
     @staticmethod
     async def notify_new_creo(callback: CallbackQuery, card: dict, i18n: I18nContext):
         users = tuple(UserRepository().designers()) + tuple(UserRepository().admins())
-        counter = 0
-        block = 0
-        other = 0
 
         for user in users:
             try:
@@ -46,12 +42,26 @@ class NotificationUsers:
                             username=callback.from_user.username, url=card['url']
                         )
                     )
-                counter += 1
             except TelegramForbiddenError as e:
-                block += 1
-                print(f"user({user}) | notify_new_creo: {e} ")
+                print(f"user({user}) TelegramForbiddenError | notify_new_creo: {e} ")
             except Exception as e:
                 print(f"user({user}) | notify_new_creo: {e} ")
-                other += 1
 
-        print(f"notify_new_creo: {counter}/{len(users)}\nblock:{block}\nother:{other}")
+    @staticmethod
+    async def notify_new_tech(callback: CallbackQuery, card: dict, i18n: I18nContext):
+        users = tuple(UserRepository().teches()) + tuple(UserRepository().admins())
+
+        for user in users:
+            try:
+                with i18n.use_locale(user.get('lang', 'uk')):
+                    await callback.bot.send_message(
+                        user['id_user'],
+                        i18n.TECH.NOTIFICATION_CARD(
+                            id=card['id'], category=card['category'], desc=card.get('description', '-'),
+                            username=callback.from_user.username, url=card['url']
+                        )
+                    )
+            except TelegramForbiddenError as e:
+                print(f"user({user}) TelegramForbiddenError | notify_new_tech: {e} ")
+            except Exception as e:
+                print(f"user({user}) | notify_new_tech: {e} ")

@@ -1,5 +1,5 @@
 from aiogram.filters.callback_data import CallbackData
-from aiogram_i18n import L
+from aiogram_i18n import L, I18nContext
 from aiogram_i18n.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
@@ -55,3 +55,14 @@ kb_choice_category_tech = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text=L.TECH.SHARE_APP(), callback_data=TechShareApp().pack())],
     [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
 ])
+
+
+class ChoiceTech(CallbackData, prefix="ChoiceTech"):
+    tech: str
+
+
+def kb_tech_choice(i18n: I18nContext):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=L.TECH.GLEB(), callback_data=ChoiceTech(tech=i18n.TECH.GLEB()).pack())],
+        [InlineKeyboardButton(text=L.TECH.EGOR(), callback_data=ChoiceTech(tech=i18n.TECH.EGOR()).pack())]
+    ])

@@ -21,13 +21,6 @@ router.message.middleware(IsRoleMiddleware(CREO_ACCESS))
 router.callback_query.middleware(IsRoleMiddleware(CREO_ACCESS))
 
 
-@router.message(F.text == L.TASK_CREO())
-async def order_creo(message: Message, state: FSMContext, i18n: I18nContext):
-    await state.clear()
-    await state.set_state(OrderCreoState.Type)
-    await message.answer(i18n.CREO.SET_TYPE(), reply_markup=kb_set_type_creo)
-
-
 @router.callback_query(TypeCreo.filter(), OrderCreoState.Type)
 async def type_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nContext):
     creo_type = callback.data.split(":")[1]
@@ -201,7 +194,3 @@ async def send_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nCo
 
     await NotificationUsers.notify_new_creo(callback, card, i18n)
 
-
-@router.callback_query(StartAgainCreo.filter(), OrderCreoState.Preview)
-async def restart_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nContext):
-    await order_creo(callback.message, state, i18n)

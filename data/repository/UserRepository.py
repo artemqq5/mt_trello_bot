@@ -44,6 +44,10 @@ class UserRepository(DefaultMySQL):
         command = "SELECT * FROM `users` WHERE `dep_user` = 'designer';"
         return self._select_all(command)
 
+    def teches(self):
+        command = "SELECT * FROM `users` WHERE `dep_user` = 'tech';"
+        return self._select_all(command)
+
     def admins(self):
         command = "SELECT * FROM `users` WHERE `dep_user` = 'admin';"
         return self._select_all(command)

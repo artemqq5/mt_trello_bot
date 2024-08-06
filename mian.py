@@ -10,10 +10,12 @@ from aiogram_i18n.cores import FluentRuntimeCore
 
 import private_config
 from domain.handler.creo import order_creo
-from domain.handler.offer.order_aff import order_aff
+from domain.handler.offer import order_aff
+from domain.handler.tech import mt_partners
 from domain.handler.tech.start import order_tech
 from domain.handler.users.admin import admin_commands
-from domain.handler.users.other import other_commands
+from domain.handler.users.other import other_commands, afmgr, dev, gamblefb, gambleppc, gambleuac, gambleuac_gambleppc, \
+    media
 from domain.handler.users.special import special_commands
 from domain.middleware.LocaleManager import LocaleManager
 from domain.middleware.UserRegistrationMiddleware import UserRegistrationMiddleware
@@ -24,11 +26,18 @@ dp = Dispatcher(storage=storage)
 dp.include_routers(
     admin_commands.router,
     special_commands.router,
-    other_commands.router,
+    afmgr.router,
+    dev.router,
+    gamblefb.router,
+    gambleppc.router,
+    gambleuac.router,
+    gambleuac_gambleppc.router,
+    media.router,
+    mt_partners.router,
     ######################
     order_creo.router,
     order_tech.router,
-    order_aff.router
+    # order_aff.router
 )
 
 
