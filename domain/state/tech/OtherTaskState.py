@@ -1,6 +1,5 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class OrderAffState(StatesGroup):
+class OtherTaskState(StatesGroup):
     Desc = State()
-

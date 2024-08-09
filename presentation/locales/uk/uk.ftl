@@ -10,7 +10,8 @@ START_SPECIAL = Привіт, у тебе з функціоналу лише pus
 MY_TASK = Мої завдання
 TASK_CREO = Крео
 TASK_TECH = Технічка
-TASK_AFF = Оффер
+TASK_AFF = Аффілейт
+
 
 # ADD USER
 ADMIN-ADD_USER = Введіть користувача формат id name dep :
@@ -52,3 +53,4 @@ DEADLINE_ERROR = Неправильний формат, перевірте на 
 
 # CREATE TASK
 ERROR_CREATE_CARD = Помилка при створенні картки
+TASK_SEND_SUCCESS = Завдання успішно надіслано

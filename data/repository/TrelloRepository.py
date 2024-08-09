@@ -1,17 +1,22 @@
+import datetime
+
+from aiogram_i18n import L
+
 from data.TrelloManager import TrelloManager
+from data.repository.AffRepository import AffRepository
 from data.repository.CreoRepository import CreoRepository
 from data.repository.TechRepository import TechRepository
-from private_config import ID_LIST_CREO_NEW, cards_label_trello, ID_LIST_TECH_GLEB, ID_LIST_TECH_EGOR
+from private_config import ID_LIST_CREO_NEW, cards_label_trello, ID_LIST_TECH_GLEB, ID_LIST_TECH_EGOR, \
+    ID_LIST_AFFILIATE_NEW, ID_LIST_TECH_IN_PROCESS
 
 
 class TrelloRepository(TrelloManager):
 
     def create_creo_task(self, data, user, i18n):
-
         add_card_to_database = CreoRepository().add(
             id_user=user['id_user'], type=data['type'], category=data['category'], description=data['desc'],
             geo=data['geo'], language=data['lang'], currency=data['currency'], format=data['format'],
-            offer=data['offer'], voice=data['voice'], source=data['source'], deadline=data.get('deadline', None),
+            offer=data['offer'], voice=data['voice'], platform=data['platform'], source=data['source'], deadline=data.get('deadline', None),
             count=data['count']
         )
 
@@ -25,6 +30,7 @@ class TrelloRepository(TrelloManager):
             card_desc=i18n.CREO.CARD_DESC(
                 type=data['type'],
                 category=data['category'],
+                platform=data['platform'],
                 geo=data['geo'],
                 lang=data['lang'],
                 currency=data['currency'],
@@ -49,7 +55,7 @@ class TrelloRepository(TrelloManager):
         json_card = load_card_to_trello.json()
 
         # set webhook to card
-        if not self._set_webhook_card(json_card['id']):
+        if not self._set_webhook_card(json_card['id'], "creo"):
             print("ERROR(creo): set webhook to card")
 
         # update database card`s id and url from trello
@@ -86,7 +92,7 @@ class TrelloRepository(TrelloManager):
         json_card = load_card_to_trello.json()
 
         # set webhook to card
-        if not self._set_webhook_card(json_card['id']):
+        if not self._set_webhook_card(json_card['id'], "tech"):
             print("ERROR(tech): set webhook to card")
 
         # update database card`s id and url from trello
@@ -94,3 +100,59 @@ class TrelloRepository(TrelloManager):
             print("ERROR(tech): update database card`s id and url from trello")
 
         return add_card_to_database
+
+    @staticmethod
+    def create_aff_task(data, user, i18n):
+
+        add_card_to_database = AffRepository().add(
+            description=data['desc'], id_user=user['id_user']
+        )
+
+        # Try to add card to local database
+        if not add_card_to_database:
+            print("ERROR(aff): Try to add card to local database")
+            return False
+
+        load_card_to_trello = TrelloManager()._create_card(
+            card_name=i18n.AFF.CARD_NAME(id=add_card_to_database),
+            card_desc=i18n.AFF.CARD_DESC(desc=data['desc'], username=user.get('username', " ")),
+            card_date=None,
+            list_id=ID_LIST_AFFILIATE_NEW,
+            labels=[cards_label_trello[user['dep_user']], ]
+        )
+
+        # try to load card to Trelo
+        if not load_card_to_trello.content:
+            print("ERROR(aff): try to load card to Trelo")
+            return False
+
+        json_card = load_card_to_trello.json()
+
+        # update database card`s id and url from trello
+        if not AffRepository().update_id_url(json_card['id'], json_card['shortUrl'], add_card_to_database):
+            print("ERROR(aff): update database card`s id and url from trello")
+
+        return add_card_to_database
+
+    def get_all_cards_by_user(self, id_user, i18n):
+        all_cards = self._get_cards(ID_LIST_TECH_EGOR).json() + \
+                    self._get_cards(ID_LIST_TECH_GLEB).json() + \
+                    self._get_cards(ID_LIST_TECH_IN_PROCESS).json() + \
+                    self._get_cards(ID_LIST_CREO_NEW).json()
+
+        tech_cards_db = {card['id']: TechRepository().card_trello_id(card['id']) for card in all_cards}
+        creo_cards_db = {card['id']: CreoRepository().card_trello_id(card['id']) for card in all_cards}
+
+        cards_list = []
+
+        for card in all_cards:
+            card_id = card['id']
+            card_db = tech_cards_db.get(card_id) or creo_cards_db.get(card_id)
+
+            if card_db and card_db['id_user'] == str(id_user):
+                list_card = dict(card_db)
+                list_card["emoji"] = i18n.MY_TASK.TECH_EMOJI() if tech_cards_db.get(card_id) else i18n.MY_TASK.CREO_EMOJI()
+                cards_list.append(list_card)
+
+        return sorted(cards_list, key=lambda card: card['date'], reverse=True)
+

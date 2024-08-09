@@ -48,6 +48,10 @@ class UserRepository(DefaultMySQL):
         command = "SELECT * FROM `users` WHERE `dep_user` = 'tech';"
         return self._select_all(command)
 
+    def affs(self):
+        command = "SELECT * FROM `users` WHERE `dep_user` = 'afmngr';"
+        return self._select_all(command)
+
     def admins(self):
         command = "SELECT * FROM `users` WHERE `dep_user` = 'admin';"
         return self._select_all(command)

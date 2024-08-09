@@ -152,7 +152,7 @@ async def deadline_creo_skip(callback: CallbackQuery, state: FSMContext, i18n: I
 @router.message(OrderCreoState.DeadLine)
 async def deadline_creo(message: Message, state: FSMContext, i18n: I18nContext):
     try:
-        date_time = datetime.datetime.strptime(message.text + " +0400", '%H:%M %d.%m.%y %z')
+        date_time = datetime.datetime.strptime(message.text + " +0300", '%H:%M %d.%m.%y %z')
         await state.update_data(deadline=str(date_time))
     except Exception as e:
         print(f"set_deadline_default_creative - {e}")
@@ -193,4 +193,5 @@ async def send_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nCo
     card = CreoRepository().card(card_id)
 
     await NotificationUsers.notify_new_creo(callback, card, i18n)
+    await callback.message.answer(i18n.TASK_SEND_SUCCESS())
 

@@ -9,6 +9,6 @@ class ChoiceAdvertiserType(CallbackData, prefix="ChoiceAdvertiserType"):
 
 def kb_choice_advertiser_type(i18n: I18nContext):
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=L.TECH.ADVERTISER_NEW(), callback_data=ChoiceAdvertiserType(advertiser=i18n.TECH.ADVERTISER_NEW()).pack())],
-        [InlineKeyboardButton(text=L.TECH.ADVERTISER_EXISTING(), callback_data=ChoiceAdvertiserType(advertiser=i18n.TECH.ADVERTISER_EXISTING()).pack())]
+        [InlineKeyboardButton(text=L.TECH.ADD_OFFER.ADVERTISER_NEW(), callback_data=ChoiceAdvertiserType(advertiser=i18n.TECH.ADD_OFFER.ADVERTISER_NEW()).pack())],
+        [InlineKeyboardButton(text=L.TECH.ADD_OFFER.ADVERTISER_EXISTING(), callback_data=ChoiceAdvertiserType(advertiser=i18n.TECH.ADD_OFFER.ADVERTISER_EXISTING()).pack())]
     ])

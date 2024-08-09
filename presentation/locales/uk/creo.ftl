@@ -45,6 +45,7 @@ CREO-CARD_NAME = #{$id} {$type} | {$category}
 CREO-CARD_DESC =
     Тип креатива: {$type}
     Вертикаль: {$category}
+    Платформа: {$platform}
     ГЕО: {$geo}
     Мова: {$lang}
     Валюта: {$currency}

@@ -7,6 +7,10 @@ class TechAddOffer(CallbackData, prefix="TechAddOffer"):
     pass
 
 
+class TechConfigurateCloak(CallbackData, prefix="TechConfigurateCloak"):
+    pass
+
+
 class TechCreateCampaign(CallbackData, prefix="TechCreateCampaign"):
     pass
 
@@ -31,10 +35,6 @@ class TechSetDomain(CallbackData, prefix="TechSetDomain"):
     pass
 
 
-class TechConfigurateCloak(CallbackData, prefix="TechConfigurateCloak"):
-    pass
-
-
 class TechShareApp(CallbackData, prefix="TechShareApp"):
     pass
 
@@ -43,16 +43,61 @@ class TechOtherTask(CallbackData, prefix="TechOtherTask"):
     pass
 
 
-kb_choice_category_tech = InlineKeyboardMarkup(inline_keyboard=[
+kb_category_tech_admin = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text=L.TECH.ADD_OFFER(), callback_data=TechAddOffer().pack())],
-    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIN(), callback_data=TechCreateCampaign().pack())],
+    [InlineKeyboardButton(text=L.TECH.CONFIGURATE_CLOAK(), callback_data=TechConfigurateCloak().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIGN(), callback_data=TechCreateCampaign().pack())],
     [InlineKeyboardButton(text=L.TECH.EDIT_OFFER(), callback_data=TechEditOffer().pack())],
     [InlineKeyboardButton(text=L.TECH.MT_PARTNERS(), callback_data=TechMTPartners().pack())],
     [InlineKeyboardButton(text=L.TECH.PREPARE_WHITE(), callback_data=TechPrepareWhite().pack())],
     [InlineKeyboardButton(text=L.TECH.CREATE_PWA(), callback_data=TechCreatePWA().pack())],
     [InlineKeyboardButton(text=L.TECH.SET_DOMAIN(), callback_data=TechSetDomain().pack())],
-    [InlineKeyboardButton(text=L.TECH.CONFIGURATE_CLOAK(), callback_data=TechConfigurateCloak().pack())],
     [InlineKeyboardButton(text=L.TECH.SHARE_APP(), callback_data=TechShareApp().pack())],
+    [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
+])
+
+kb_category_tech_gambleppc = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.CONFIGURATE_CLOAK(), callback_data=TechConfigurateCloak().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIGN(), callback_data=TechCreateCampaign().pack())],
+    [InlineKeyboardButton(text=L.TECH.PREPARE_WHITE(), callback_data=TechPrepareWhite().pack())],
+    [InlineKeyboardButton(text=L.TECH.SET_DOMAIN(), callback_data=TechSetDomain().pack())],
+    [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
+])
+
+kb_category_tech_gamblefb = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIGN(), callback_data=TechCreateCampaign().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_PWA(), callback_data=TechCreatePWA().pack())],
+    [InlineKeyboardButton(text=L.TECH.SHARE_APP(), callback_data=TechShareApp().pack())],
+    [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
+])
+
+kb_category_tech_gambleuac = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIGN(), callback_data=TechCreateCampaign().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_PWA(), callback_data=TechCreatePWA().pack())],
+    [InlineKeyboardButton(text=L.TECH.SHARE_APP(), callback_data=TechShareApp().pack())],
+    [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
+])
+
+kb_category_tech_gambleuac_ppc = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.CONFIGURATE_CLOAK(), callback_data=TechConfigurateCloak().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_CAMPAIGN(), callback_data=TechCreateCampaign().pack())],
+    [InlineKeyboardButton(text=L.TECH.PREPARE_WHITE(), callback_data=TechPrepareWhite().pack())],
+    [InlineKeyboardButton(text=L.TECH.CREATE_PWA(), callback_data=TechCreatePWA().pack())],
+    [InlineKeyboardButton(text=L.TECH.SET_DOMAIN(), callback_data=TechSetDomain().pack())],
+    [InlineKeyboardButton(text=L.TECH.SHARE_APP(), callback_data=TechShareApp().pack())],
+    [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
+])
+
+kb_category_tech_afmngr = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.ADD_OFFER(), callback_data=TechAddOffer().pack())],
+    [InlineKeyboardButton(text=L.TECH.EDIT_OFFER(), callback_data=TechEditOffer().pack())],
+])
+
+kb_category_tech_mt_partners = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.TECH.MT_PARTNERS(), callback_data=TechMTPartners().pack())],
+])
+
+kb_category_tech_dev = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text=L.TECH.OTHER_TASK(), callback_data=TechOtherTask().pack())],
 ])
 
@@ -61,8 +106,17 @@ class ChoiceTech(CallbackData, prefix="ChoiceTech"):
     tech: str
 
 
-def kb_tech_choice(i18n: I18nContext):
+def kb_tech_choice():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=L.TECH.GLEB(), callback_data=ChoiceTech(tech=i18n.TECH.GLEB()).pack())],
-        [InlineKeyboardButton(text=L.TECH.EGOR(), callback_data=ChoiceTech(tech=i18n.TECH.EGOR()).pack())]
+        [InlineKeyboardButton(text=L.TECH.GLEB(), callback_data=ChoiceTech(tech="Gleb").pack())],
+        [InlineKeyboardButton(text=L.TECH.EGOR(), callback_data=ChoiceTech(tech="Egor").pack())]
     ])
+
+
+class SkipDeadLineTech(CallbackData, prefix="SkipDeadLineTech"):
+    pass
+
+
+kb_skip_deadline_tech = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text=L.SKIP(), callback_data=SkipDeadLineTech().pack())]
+])
