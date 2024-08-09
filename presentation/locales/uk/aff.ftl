@@ -1,16 +1,16 @@
 # AFF TASK
-AFF-DESC_OFFER = Напишіть інформацію по оферам:
+AFF-DESC_OFFER = 📝 Напишіть інформацію по оферам:
 
-AFF-CARD_NAME = #{$id} Оффер
+AFF-CARD_NAME = #{$id} 💼 Оффер
 AFF-CARD_DESC =
-    {$desc}
+    📋 Опис: {$desc}
 
-    Задача від: @{$username}
+    👤 Задача від: @{$username}
 
 AFF-NOTIFICATION_CARD =
-    #{$id} Задача
+    #{$id} 📌 Задача
     ━━━━━━━━━━━━━━━━
-    {$desc}
+    📝 {$desc}
 
-    Задача від: @{$username}
-    Посилання в Trello: {$url}
+    👤 Задача від: @{$username}
+    🔗 Посилання в Trello: {$url}
