@@ -25,3 +25,5 @@ async def start(message: Message, state: FSMContext, i18n: I18nContext):
 async def order_tech_start(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await message.answer(i18n.TECH.CHOICE_CATEGORY(), reply_markup=kb_category_tech_afmngr)
+
+
