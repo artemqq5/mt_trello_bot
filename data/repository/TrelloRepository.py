@@ -6,8 +6,8 @@ from data.TrelloManager import TrelloManager
 from data.repository.AffRepository import AffRepository
 from data.repository.CreoRepository import CreoRepository
 from data.repository.TechRepository import TechRepository
-from private_config import ID_LIST_CREO_NEW, cards_label_trello, ID_LIST_TECH_GLEB, ID_LIST_TECH_EGOR, \
-    ID_LIST_AFFILIATE_NEW, ID_LIST_TECH_IN_PROCESS
+from private_config import ID_LIST_CREO_NEW, ID_LIST_TECH_GLEB, ID_LIST_TECH_EGOR, \
+    ID_LIST_AFFILIATE_NEW, ID_LIST_TECH_IN_PROCESS, cards_label_trello_creo, cards_label_trello_tech
 
 
 class TrelloRepository(TrelloManager):
@@ -44,7 +44,7 @@ class TrelloRepository(TrelloManager):
             ),
             card_date=data.get('deadline', None),
             list_id=ID_LIST_CREO_NEW,
-            labels=[user['label_creo'], cards_label_trello[user['dep_user']]]
+            labels=[user['label_creo'], cards_label_trello_creo[user['dep_user']]]
         )
 
         # try to load card to Trelo
@@ -81,7 +81,7 @@ class TrelloRepository(TrelloManager):
             card_desc=i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " ")),
             card_date=data.get('deadline', None),
             list_id=ID_LIST_TECH_GLEB if data['tech'] == i18n.TECH.GLEB() else ID_LIST_TECH_EGOR,
-            labels=[user['label_tech'], cards_label_trello[user['dep_user']]]
+            labels=[user['label_tech'], cards_label_trello_tech[user['dep_user']]]
         )
 
         # try to load card to Trelo
@@ -118,7 +118,7 @@ class TrelloRepository(TrelloManager):
             card_desc=i18n.AFF.CARD_DESC(desc=data['desc'], username=user.get('username', " ")),
             card_date=None,
             list_id=ID_LIST_AFFILIATE_NEW,
-            labels=[cards_label_trello[user['dep_user']], ]
+            labels=None
         )
 
         # try to load card to Trelo
