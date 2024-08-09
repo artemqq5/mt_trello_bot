@@ -6,8 +6,7 @@ from data.TrelloManager import TrelloManager
 from data.repository.AffRepository import AffRepository
 from data.repository.CreoRepository import CreoRepository
 from data.repository.TechRepository import TechRepository
-from private_config import ID_LIST_CREO_NEW, ID_LIST_TECH_GLEB, ID_LIST_TECH_EGOR, \
-    ID_LIST_AFFILIATE_NEW, ID_LIST_TECH_IN_PROCESS, cards_label_trello_creo, cards_label_trello_tech
+from private_config import *
 
 
 class TrelloRepository(TrelloManager):
