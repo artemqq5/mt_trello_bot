@@ -79,7 +79,7 @@ class TrelloRepository(TrelloManager):
             card_name=i18n.TECH.CARD_NAME(id=add_card_to_database, category=data['category']),
             card_desc=i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " ")),
             card_date=data.get('deadline', None),
-            list_id=ID_LIST_TECH_GLEB if data['tech'] == i18n.TECH.GLEB() else ID_LIST_TECH_EGOR,
+            list_id=ID_LIST_TECH_GLEB if data['tech'] == "Gleb" else ID_LIST_TECH_EGOR,
             labels=[user['label_tech'], cards_label_trello_tech[user['dep_user']]]
         )
 
