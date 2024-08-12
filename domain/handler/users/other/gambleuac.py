@@ -52,7 +52,7 @@ async def restart_callback(callback: CallbackQuery, state: FSMContext, i18n: I18
     await order_creo_start(callback.message, state, i18n)
 
 
-@router.message(F.text == L.MY_TASK(), IsDepFilter((GAMBLE_PPC,)))
+@router.message(F.text == L.MY_TASK(), IsDepFilter((GAMBLE_UAC,)))
 async def my_tasks(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(MyTaskState.ChoiceTask)
