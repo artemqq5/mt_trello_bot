@@ -1,5 +1,6 @@
 import datetime
 
+import requests
 from aiogram_i18n import L
 
 from data.TrelloManager import TrelloManager
@@ -84,11 +85,16 @@ class TrelloRepository(TrelloManager):
         )
 
         # try to load card to Trelo
-        if not load_card_to_trello.content:
-            print("ERROR(tech): try to load card to Trelo")
+        if not load_card_to_trello or not load_card_to_trello.content:
+            print("ERROR(tech): Failed to create card in Trello")
             return False
 
-        json_card = load_card_to_trello.json()
+        try:
+            json_card = load_card_to_trello.json()
+        except requests.exceptions.JSONDecodeError:
+            print("ERROR(tech): Failed to parse JSON from Trello response")
+            print(f"Trello Response: {load_card_to_trello.text}")
+            return False
 
         # set webhook to card
         if not self._set_webhook_card(json_card['id'], "tech"):
