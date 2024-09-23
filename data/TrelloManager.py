@@ -24,6 +24,7 @@ class TrelloManager:
     # CREATE CARD
     def _create_card(self, card_name, card_desc, card_date, labels, list_id):
         query = {'idList': list_id, 'name': card_name, 'desc': card_desc, 'idLabels': labels, 'due': card_date}
+        print(query)
         return requests.request(
             "POST",
             url=self.__url_card,
