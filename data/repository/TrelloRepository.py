@@ -51,7 +51,6 @@ class TrelloRepository(TrelloManager):
         if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(creo): try to load card to Trelo")
             print(load_card_to_trello)
-            print(load_card_to_trello.content)
             return False
 
         try:
@@ -95,7 +94,6 @@ class TrelloRepository(TrelloManager):
         if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(tech): Failed to create card in Trello")
             print(load_card_to_trello)
-            print(load_card_to_trello.content)
             return False
 
         try:
@@ -139,7 +137,6 @@ class TrelloRepository(TrelloManager):
         if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(aff): try to load card to Trelo")
             print(load_card_to_trello)
-            print(load_card_to_trello.content)
             return False
 
         try:

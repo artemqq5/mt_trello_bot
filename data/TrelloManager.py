@@ -18,18 +18,17 @@ class TrelloManager:
     # CREATE LABEL
     def _create_label(self, username, board_id):
         query = {'name': f'{username}', 'color': 'black', 'idBoard': board_id}
-        response = requests.request("POST", url=self.__url_lebel, params=query | self.__default_body)
+        response = requests.request("POST", url=self.__url_lebel, json=query | self.__default_body)
         return literal_eval(response.text)['id']
 
     # CREATE CARD
     def _create_card(self, card_name, card_desc, card_date, labels, list_id):
         query = {'idList': list_id, 'name': card_name, 'desc': card_desc, 'idLabels': labels, 'due': card_date}
-        print(query)
         return requests.request(
             "POST",
             url=self.__url_card,
-            headers={"Accept": "application/json"},
-            params=query | self.__default_body
+            headers={"Accept": "application/json", 'Content-Type': 'application/json; charset=utf-8'},
+            json=query | self.__default_body
         )
 
     # CREATE WEBHOOK CARD
@@ -38,7 +37,7 @@ class TrelloManager:
         return requests.post(
             self.__url_webhook,
             headers={'Content-Type': 'application/json'},
-            params=query | self.__default_body
+            json=query | self.__default_body
         )
 
     def _get_cards(self, list_id):
@@ -62,6 +61,6 @@ class TrelloManager:
             "POST",
             url=self.__url_card + id_card + "/actions/comments",
             headers={"Accept": "application/json"},
-            params={'text': text} | self.__default_body
+            json={'text': text} | self.__default_body
         )
 
