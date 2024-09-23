@@ -48,11 +48,18 @@ class TrelloRepository(TrelloManager):
         )
 
         # try to load card to Trelo
-        if not load_card_to_trello.content:
+        if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(creo): try to load card to Trelo")
+            print(load_card_to_trello)
+            print(load_card_to_trello.content)
             return False
 
-        json_card = load_card_to_trello.json()
+        try:
+            json_card = load_card_to_trello.json()
+        except requests.exceptions.JSONDecodeError:
+            print("ERROR(creo): Failed to parse JSON from Trello response")
+            print(f"Trello Response: {load_card_to_trello.text}")
+            return False
 
         # set webhook to card
         if not self._set_webhook_card(json_card['id'], "creo"):
@@ -87,6 +94,8 @@ class TrelloRepository(TrelloManager):
         # try to load card to Trelo
         if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(tech): Failed to create card in Trello")
+            print(load_card_to_trello)
+            print(load_card_to_trello.content)
             return False
 
         try:
@@ -127,11 +136,18 @@ class TrelloRepository(TrelloManager):
         )
 
         # try to load card to Trelo
-        if not load_card_to_trello.content:
+        if not load_card_to_trello or not load_card_to_trello.content:
             print("ERROR(aff): try to load card to Trelo")
+            print(load_card_to_trello)
+            print(load_card_to_trello.content)
             return False
 
-        json_card = load_card_to_trello.json()
+        try:
+            json_card = load_card_to_trello.json()
+        except requests.exceptions.JSONDecodeError:
+            print("ERROR(aff): Failed to parse JSON from Trello response")
+            print(f"Trello Response: {load_card_to_trello.text}")
+            return False
 
         # update database card`s id and url from trello
         if not AffRepository().update_id_url(json_card['id'], json_card['shortUrl'], add_card_to_database):
