@@ -78,7 +78,7 @@ async def voice(message: Message, state: FSMContext, i18n: I18nContext):
     await message.answer(i18n.CREO.SET_SOURCE())
 
 
-@router.message(OrderCreoState.Source)
+@router.message(OrderCreoState.Source, F.text)
 async def source(message: Message, state: FSMContext, i18n: I18nContext):
     await state.update_data(source=message.text)
     await state.set_state(OrderCreoState.Desc)

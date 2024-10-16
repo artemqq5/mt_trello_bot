@@ -22,7 +22,7 @@ class UserRegistrationMiddleware(BaseMiddleware):
         current_user = UserRepository().user(tg_user.id)
 
         if current_user:
-            if not current_user['username']:
+            if not current_user.get('username', None):
                 UserRepository().update_username(tg_user.id, tg_user.username)
 
             if not current_user['firstname']:
