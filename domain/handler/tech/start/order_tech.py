@@ -64,6 +64,8 @@ async def choice_tech(callback: CallbackQuery, state: FSMContext, i18n: I18nCont
     data = await state.update_data()
     user = UserRepository().user(callback.from_user.id)
 
+    await callback.message.delete()
+
     if not (card_id := TrelloRepository().create_tech_task(data, user, i18n)):
         await callback.answer(i18n.ERROR_CREATE_CARD(), show_alert=True)
         return

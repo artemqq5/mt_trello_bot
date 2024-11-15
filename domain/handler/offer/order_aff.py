@@ -29,6 +29,8 @@ async def order_aff_desc(message: Message, state: FSMContext, i18n: I18nContext)
     data = await state.update_data()
     user = UserRepository().user(message.from_user.id)
 
+    await message.delete()
+
     if not (card_id := TrelloRepository().create_aff_task(data, user, i18n)):
         await message.answer(i18n.ERROR_CREATE_CARD(), show_alert=True)
         return

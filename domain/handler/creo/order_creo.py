@@ -186,6 +186,8 @@ async def send_callback(callback: CallbackQuery, state: FSMContext, i18n: I18nCo
     data = await state.update_data()
     user = UserRepository().user(callback.from_user.id)
 
+    await callback.message.delete()
+
     if not (card_id := TrelloRepository().create_creo_task(data, user, i18n)):
         await callback.answer(i18n.ERROR_CREATE_CARD(), show_alert=True)
         return
