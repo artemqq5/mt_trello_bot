@@ -84,8 +84,8 @@ class TrelloRepository(TrelloManager):
         if user['dep_user'] in BUYERS_ROLE_LIST:
             desc = i18n.TECH.CARD_DESC_TDS_ID(
                 desc=data['description_card'],
-                username=user.get('username', " "),
-                tds_id=user.get('tds_buyer_id', '-'))
+                username=user.get('username') or " ",
+                tds_id=user.get('tds_buyer_id') or "-")
         else:
             desc = i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " "))
 
