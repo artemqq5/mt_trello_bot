@@ -20,6 +20,14 @@ TECH-CARD_DESC =
     {$desc}
 
     Задача від: @{$username}
+
+TECH-CARD_DESC_TDS_ID =
+    {$desc}
+
+    BUYER TDS ID: {$tds_id}
+
+    Задача від: @{$username}
+
 TECH-NOTIFICATION_CARD =
     #{$id} {$category}
     ━━━━━━━━━━━━━━━━

@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram_i18n import I18nContext
 
-from data.const import TECH_ACCESS
+from data.const import TECH_ACCESS, BUYERS_ROLE_LIST
 from data.repository.TechRepository import TechRepository
 from data.repository.TrelloRepository import TrelloRepository
 from data.repository.UserRepository import UserRepository
@@ -61,12 +61,12 @@ async def choice_tech(callback: CallbackQuery, state: FSMContext, i18n: I18nCont
     tech = callback.data.split(":")[1]
     await state.update_data(tech=tech)
 
-    data = await state.update_data()
     user = UserRepository().user(callback.from_user.id)
+    data = await state.get_data()
 
     await callback.message.delete()
 
-    if not (card_id := TrelloRepository().create_tech_task(data, user, i18n)):
+    if not (card_id := TrelloRepository().create_tech_task(data, user, i18n, )):
         await callback.answer(i18n.ERROR_CREATE_CARD(), show_alert=True)
         return
 
@@ -74,3 +74,4 @@ async def choice_tech(callback: CallbackQuery, state: FSMContext, i18n: I18nCont
 
     await NotificationUsers.notify_new_tech(callback, card, i18n)
     await callback.message.answer(i18n.TASK_SEND_SUCCESS())
+

@@ -1,9 +1,7 @@
-import datetime
-
 import requests
-from aiogram_i18n import L
 
 from data.TrelloManager import TrelloManager
+from data.const import BUYERS_ROLE_LIST
 from data.repository.AffRepository import AffRepository
 from data.repository.CreoRepository import CreoRepository
 from data.repository.TechRepository import TechRepository
@@ -16,7 +14,8 @@ class TrelloRepository(TrelloManager):
         add_card_to_database = CreoRepository().add(
             id_user=user['id_user'], type=data['type'], category=data['category'], description=data['desc'],
             geo=data['geo'], language=data['lang'], currency=data['currency'], format=data['format'],
-            offer=data['offer'], voice=data['voice'], platform=data['platform'], source=data['source'], deadline=data.get('deadline', None),
+            offer=data['offer'], voice=data['voice'], platform=data['platform'], source=data['source'],
+            deadline=data.get('deadline', None),
             count=data['count']
         )
 
@@ -82,9 +81,17 @@ class TrelloRepository(TrelloManager):
             print("ERROR(tech): Try to add card to local database")
             return False
 
+        if user['dep_user'] in BUYERS_ROLE_LIST:
+            desc = i18n.TECH.CARD_DESC_TDS_ID(
+                desc=data['description_card'],
+                username=user.get('username', " "),
+                tds_id=user.get('tds_buyer_id', '-'))
+        else:
+            desc = i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " "))
+
         load_card_to_trello = TrelloManager()._create_card(
             card_name=i18n.TECH.CARD_NAME(id=add_card_to_database, category=data['category']),
-            card_desc=i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " ")),
+            card_desc=desc,
             card_date=data.get('deadline', None),
             list_id=ID_LIST_TECH_GLEB if data['tech'] == "Gleb" else ID_LIST_TECH_EGOR,
             labels=[user['label_tech'], cards_label_trello_tech[user['dep_user']]]
@@ -169,8 +176,8 @@ class TrelloRepository(TrelloManager):
 
             if card_db and card_db['id_user'] == str(id_user):
                 list_card = dict(card_db)
-                list_card["emoji"] = i18n.MY_TASK.TECH_EMOJI() if tech_cards_db.get(card_id) else i18n.MY_TASK.CREO_EMOJI()
+                list_card["emoji"] = i18n.MY_TASK.TECH_EMOJI() if tech_cards_db.get(
+                    card_id) else i18n.MY_TASK.CREO_EMOJI()
                 cards_list.append(list_card)
 
         return sorted(cards_list, key=lambda card: card['date'], reverse=True)
-
