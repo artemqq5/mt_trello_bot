@@ -51,14 +51,6 @@ async def main():
     default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
     bot = Bot(token=private_config.BOT_TOKEN, default=default_properties)
 
-    commands = [
-        BotCommand(command="start", description="Запустити бота"),
-        BotCommand(command="get_id", description="Дізнатися Telegram ID"),
-    ]
-
-    # Встановлюємо команди
-    await bot.set_my_commands(commands)
-
     i18n_middleware = I18nMiddleware(
         core=FluentRuntimeCore(path='presentation/locales'),
         default_locale='en',
