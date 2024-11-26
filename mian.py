@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import BotCommand
 from aiogram_i18n import I18nMiddleware
 from aiogram_i18n.cores import FluentRuntimeCore
 
@@ -13,6 +14,7 @@ from domain.handler.creo import order_creo
 from domain.handler.my_task import my_task_manager
 from domain.handler.offer import order_aff
 from domain.handler.tech.start import order_tech
+from domain.handler.users import general_
 from domain.handler.users.admin import admin_commands
 from domain.handler.users.other import afmgr, dev, gamblefb, gambleppc, gambleuac, gambleuac_gambleppc, \
     media, mt_partners
@@ -39,7 +41,8 @@ dp.include_routers(
     order_tech.router,
     order_aff.router,
     ######################
-    my_task_manager.router
+    my_task_manager.router,
+    general_.router
 )
 
 
@@ -47,6 +50,14 @@ async def main():
     logging.basicConfig(level=logging.INFO)
     default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
     bot = Bot(token=private_config.BOT_TOKEN, default=default_properties)
+
+    commands = [
+        BotCommand(command="start", description="Запустити бота"),
+        BotCommand(command="get_id", description="Дізнатися Telegram ID"),
+    ]
+
+    # Встановлюємо команди
+    await bot.set_my_commands(commands)
 
     i18n_middleware = I18nMiddleware(
         core=FluentRuntimeCore(path='presentation/locales'),

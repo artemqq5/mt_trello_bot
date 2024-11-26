@@ -30,6 +30,7 @@ async def showuser(callback: CallbackQuery, state: FSMContext, i18n: I18nContext
 
     firstname = user['firstname'] if user['firstname'] else "-"
     username = user['username'] if user['username'] else "-"
+    tds_id = user['tds_buyer_id'] if user['tds_buyer_id'] else "-"
 
     await callback.message.edit_text(
         i18n.ADMIN.GET_USER_INFO(
@@ -37,7 +38,8 @@ async def showuser(callback: CallbackQuery, state: FSMContext, i18n: I18nContext
             nickname=user['name_user'],
             firstname=firstname,
             username=username,
-            dep=user['dep_user']
+            dep=user['dep_user'],
+            tds=tds_id
         ), reply_markup=kb_user_back)
 
 

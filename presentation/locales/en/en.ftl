@@ -5,6 +5,9 @@ SKIP = ⏭️ Skip
 # Access messages
 ACCESS_DENIED = 🚫 Access denied. Please contact the admin to get access.
 
+# get user id
+GET_USER_ID = Your Telegram ID (<code>{$telegram_id}</code>)
+
 # Greetings
 START = 👋 Hello, please select a task type
 START_ADMIN = 👋 Hello, you are an administrator with full access
@@ -16,12 +19,19 @@ TASK_CREO = 🎨 Creative
 TASK_TECH = 🛠️ Technical
 TASK_AFF = 🤝 Affiliate
 
+# admin menu
+ADMIN-ADD = ➕ Add
+ADMIN-DELETE = 🔻 Delete
+ADMIN-MAILING = 📩 Messaging
+ADMIN-USERS = 👨‍👩‍👦 Users
+
 # Add user
-ADMIN-ADD_USER = Enter user in format id name dep :
-ADMIN-ADD_USER_ERROR_FORMAT = ❌ Incorrect! Use format id name dep with spaces, e.g., 66503250 Ignat media
-ADMIN-ADD_USER_ERROR_DEP = ❌ The specified dep is not available. Choose from {$dep}
-ADMIN-USER_ALREADY_EXIST = ⚠️ The user is already in the database
-ADMIN-USER_ADD_SUCCESS = ✅ User added successfully
+ADMIN-ADD_USER-NAME = Enter the user's name:
+ADMIN-ADD_USER-TELEGRAM_ID = Enter the user's Telegram ID. The user to be added can find their ID by typing the /get_id command in this bot:
+ADMIN-ADD_USER-ROLE = Select the user's role:
+ADMIN-ADD_USER-TDS_ID = Enter the user's TDS ID:
+ADMIN-USER_ALREADY_EXIST = ⚠️ The user already exists in the database
+ADMIN-USER_ADD_SUCCESS = ✅ User successfully added
 ADMIN-USER_ADD_FAIL = ❌ Failed to add user
 
 # Delete user
@@ -36,6 +46,7 @@ ADMIN-GET_USER_INFO = <b>📋 Telegram ID:</b> <code>{$tg}</code>
     <b>Telegram Name:</b> {$firstname}
     <b>Username:</b> {$username}
     <b>Role:</b> {$dep}
+    <b>TDS ID:</b> <code>{$tds}</code>
 
 # Mailing
 ADMIN-INPUT_TEXT_MAILING = Enter text for mailing:

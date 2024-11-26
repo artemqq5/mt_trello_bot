@@ -9,13 +9,14 @@ from data.repository.TrelloRepository import TrelloRepository
 from domain.filter.IsDepFilter import IsDepFilter
 from domain.handler.users.admin.command_ import delete_user, get_all, mailing_all, add_user
 from domain.middleware.IsRoleMiddleware import IsRoleMiddleware
+from domain.state.admin.AddUserState import AddUserState
 from domain.state.admin.AdminSystemState import AdminSystemState
 from domain.state.aff.OrderAffState import OrderAffState
 from domain.state.creo.OrderCreoState import OrderCreoState
 from domain.state.my_task.MyTaskState import MyTaskState
 from presentation.keyboards.admin.kb_users import text_users_category, kb_show_users
 from presentation.keyboards.creo.kb_order_creo import kb_set_type_creo, StartAgainCreo
-from presentation.keyboards.kb_menu import kb_menu_all
+from presentation.keyboards.kb_menu import kb_menu_admin
 from presentation.keyboards.my_task.kb_my_task import kb_show_task
 from presentation.keyboards.tech.kb_order_tech import kb_category_tech_admin
 
@@ -35,31 +36,31 @@ router.callback_query.middleware(IsRoleMiddleware((ADMIN,)))
 @router.message(Command("start"), IsDepFilter((ADMIN,)))
 async def start(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
-    await message.answer(i18n.START_ADMIN(), reply_markup=kb_menu_all)
+    await message.answer(i18n.START_ADMIN(), reply_markup=kb_menu_admin)
 
 
-@router.message(Command("add_user"))
+@router.message(F.text == L.ADMIN.ADD())
 async def add_user1(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
-    await state.set_state(AdminSystemState.AddUser)
-    await message.answer(i18n.ADMIN.ADD_USER())
+    await state.set_state(AddUserState.Name)
+    await message.answer(i18n.ADMIN.ADD_USER.NAME())
 
 
-@router.message(Command("delete_user"))
+@router.message(F.text == L.ADMIN.DELETE())
 async def delete_user1(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(AdminSystemState.DeleteUser)
     await message.answer(i18n.ADMIN.DELETE_USER())
 
 
-@router.message(Command("get_all"))
+@router.message(F.text == L.ADMIN.USERS())
 async def get_all(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(AdminSystemState.GetAll)
     await message.answer(text=text_users_category(), reply_markup=kb_show_users())
 
 
-@router.message(Command("mailing_all"))
+@router.message(F.text == L.ADMIN.MAILING())
 async def mailing_all1(message: Message, state: FSMContext, i18n: I18nContext):
     await state.clear()
     await state.set_state(AdminSystemState.MailingAll)

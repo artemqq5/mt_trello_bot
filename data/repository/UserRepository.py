@@ -10,6 +10,10 @@ class UserRepository(DefaultMySQL):
         command = "INSERT INTO `users` (`id_user`, `name_user`, `dep_user`, `label_tech`, `label_creo`) VALUES (%s, %s, %s, %s, %s);"
         return self._insert(command, (id_user, name_user, dep_user, label_tech, label_creo))
 
+    def add_buyer(self, id_user, name_user, dep_user, tds_id, label_tech, label_creo):
+        command = "INSERT INTO `users` (`id_user`, `name_user`, `dep_user`, `tds_buyer_id`, `label_tech`, `label_creo`) VALUES (%s, %s, %s, %s, %s, %s);"
+        return self._insert(command, (id_user, name_user, dep_user, tds_id, label_tech, label_creo))
+
     def delete(self, id_user):
         command = "DELETE FROM `users` WHERE `id_user` = %s;"
         return self._delete(command, (id_user,))

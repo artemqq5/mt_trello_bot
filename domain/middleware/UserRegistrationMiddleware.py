@@ -1,6 +1,6 @@
 from typing import Callable, Any, Dict, Awaitable
 
-from aiogram import BaseMiddleware, types
+from aiogram import BaseMiddleware, types, F
 from aiogram.types import TelegramObject
 from aiogram_i18n import L
 
@@ -20,6 +20,9 @@ class UserRegistrationMiddleware(BaseMiddleware):
         message = event if isinstance(event, types.Message) else event.message
         tg_user = event.from_user
         current_user = UserRepository().user(tg_user.id)
+
+        if message.text == "/get_id":
+            return await handler(event, data)
 
         if current_user:
             if not current_user.get('username', None):
