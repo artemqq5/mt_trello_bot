@@ -109,7 +109,7 @@ class ChoiceTech(CallbackData, prefix="ChoiceTech"):
 def kb_tech_choice():
     return InlineKeyboardMarkup(inline_keyboard=[
         # [InlineKeyboardButton(text=L.TECH.GLEB(), callback_data=ChoiceTech(tech="Gleb").pack())],
-        [InlineKeyboardButton(text=L.TECH.EGOR(), callback_data=ChoiceTech(tech="Egor").pack())]
+        [InlineKeyboardButton(text=L.TECH.EGOR(), callback_data=ChoiceTech(tech="Andrew").pack())]
     ])
 
 

@@ -13,7 +13,7 @@ TECH-CHOICE_CATEGORY = 📌 Choose category
 
 TECH-CHOICE_TECH = 👨‍💻 Choose technician for the task:
 TECH-GLEB = Gleb
-TECH-EGOR = Egor
+TECH-EGOR = Andrew
 
 TECH-CARD_NAME = #{$id} {$category}
 TECH-CARD_DESC =

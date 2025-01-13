@@ -13,7 +13,7 @@ TECH-CHOICE_CATEGORY = 📌 Выберите категорию
 
 TECH-CHOICE_TECH = 👨‍💻 Выберите техника для задачи:
 TECH-GLEB = Глеб
-TECH-EGOR = Егор
+TECH-EGOR = Андрей
 
 TECH-CARD_NAME = #{$id} {$category}
 TECH-CARD_DESC =
