@@ -54,6 +54,9 @@ class NotificationUsers:
         for user in users:
             try:
                 with i18n.use_locale(user.get('lang', 'uk')):
+                    if user['name_user'] == 'D_Artm':
+                        return
+
                     await callback.bot.send_message(
                         user['id_user'],
                         i18n.TECH.NOTIFICATION_CARD(
