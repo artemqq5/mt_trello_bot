@@ -143,3 +143,7 @@ TECH-SHARE_APP-CARD_DESC =
 
     Description:
     {$desc}
+###############################
+TECH-BOT_TASK = 💎 Bots\Microservices\Other
+TECH-BOT_TASK-NAME = Name of task
+TECH-BOT_TASK-DESC = Describe the task by detailing all points that need to be implemented. The more details, the better, otherwise they might be missed during implementation if not specified

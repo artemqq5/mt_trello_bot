@@ -10,7 +10,7 @@ from data.repository.TechRepository import TechRepository
 from data.repository.TrelloRepository import TrelloRepository
 from data.repository.UserRepository import UserRepository
 from domain.handler.tech import add_offer, create_campaign, configurate_cloak, create_pwa, edit_offer, mt_partners_task, \
-    other_task, prepare_white, set_domain, share_app
+    other_task, prepare_white, set_domain, share_app, other_bot_task
 from domain.middleware.IsRoleMiddleware import IsRoleMiddleware
 from domain.state.tech.TechTaskState import TechTaskState
 from domain.use_case.NotificationUsers import NotificationUsers
@@ -30,6 +30,7 @@ router.include_routers(
     set_domain.router,
     share_app.router,
     other_task.router,
+    other_bot_task.router
 )
 
 router.message.middleware(IsRoleMiddleware(TECH_ACCESS))

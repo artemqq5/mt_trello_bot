@@ -67,6 +67,25 @@ class NotificationUsers:
                 print(f"user({user}) | notify_new_tech: {e} ")
 
     @staticmethod
+    async def notify_new_bot(message, card: dict, i18n: I18nContext):
+        users = tuple(UserRepository().admins())
+
+        for user in users:
+            try:
+                with i18n.use_locale(user.get('lang', 'uk')):
+                    await message.bot.send_message(
+                        user['id_user'],
+                        i18n.TECH.NOTIFICATION_CARD(
+                            id=card['id'], category=card['category'], desc=card.get('description', '-'),
+                            username=message.from_user.username, url=card['url']
+                        )
+                    )
+            except TelegramForbiddenError as e:
+                print(f"user({user}) TelegramForbiddenError | notify_new_bot: {e} ")
+            except Exception as e:
+                print(f"user({user}) | notify_new_bot: {e} ")
+
+    @staticmethod
     async def notify_new_aff(message: Message, card: dict, i18n: I18nContext):
         users = tuple(UserRepository().affs()) + tuple(UserRepository().admins())
 

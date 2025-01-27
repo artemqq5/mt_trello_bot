@@ -121,6 +121,47 @@ class TrelloRepository(TrelloManager):
         return add_card_to_database
 
     @staticmethod
+    def create_task_bot(data, user, i18n):
+        add_card_to_database = TechRepository().add(
+            category=data['category'], description=data['description_card'], deadline=data.get('deadline', None),
+            id_user=user['id_user'], tech=data['tech']
+        )
+
+        # Try to add card to local database
+        if not add_card_to_database:
+            print("ERROR(tech bot): Try to add card to local database")
+            return False
+
+        desc = i18n.TECH.CARD_DESC(desc=data['description_card'], username=user.get('username', " "))
+
+        load_card_to_trello = TrelloManager()._create_card(
+            card_name=data.get('name'),
+            card_desc=desc,
+            card_date=None,
+            list_id=ID_LIST_TECH_ARTEM,
+            labels=None
+        )
+
+        # try to load card to Trelo
+        if not load_card_to_trello or not load_card_to_trello.content:
+            print("ERROR(tech bot): Failed to create card in Trello")
+            print(load_card_to_trello)
+            return False
+
+        try:
+            json_card = load_card_to_trello.json()
+        except requests.exceptions.JSONDecodeError:
+            print("ERROR(tech bot): Failed to parse JSON from Trello response")
+            print(f"Trello Response: {load_card_to_trello.text}")
+            return False
+
+        # update database card`s id and url from trello
+        if not TechRepository().update_id_url(json_card['id'], json_card['shortUrl'], add_card_to_database):
+            print("ERROR(tech bot): update database card`s id and url from trello")
+
+        return add_card_to_database
+
+    @staticmethod
     def create_aff_task(data, user, i18n):
 
         add_card_to_database = AffRepository().add(
@@ -163,7 +204,8 @@ class TrelloRepository(TrelloManager):
         all_cards = self._get_cards(ID_LIST_TECH_EGOR).json() + \
                     self._get_cards(ID_LIST_TECH_GLEB).json() + \
                     self._get_cards(ID_LIST_TECH_IN_PROCESS).json() + \
-                    self._get_cards(ID_LIST_CREO_NEW).json()
+                    self._get_cards(ID_LIST_CREO_NEW).json() + \
+                    self._get_cards(ID_LIST_TECH_ARTEM).json()
 
         tech_cards_db = {card['id']: TechRepository().card_trello_id(card['id']) for card in all_cards}
         creo_cards_db = {card['id']: CreoRepository().card_trello_id(card['id']) for card in all_cards}
