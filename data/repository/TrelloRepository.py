@@ -120,8 +120,7 @@ class TrelloRepository(TrelloManager):
 
         return add_card_to_database
 
-    @staticmethod
-    def create_task_bot(data, user, i18n):
+    def create_task_bot(self, data, user, i18n):
         add_card_to_database = TechRepository().add(
             category=data['category'], description=data['description_card'], deadline=data.get('deadline', None),
             id_user=user['id_user'], tech=data['tech']
@@ -158,6 +157,10 @@ class TrelloRepository(TrelloManager):
         # update database card`s id and url from trello
         if not TechRepository().update_id_url(json_card['id'], json_card['shortUrl'], add_card_to_database):
             print("ERROR(tech bot): update database card`s id and url from trello")
+
+        # set webhook to card
+        if not self._set_webhook_card(json_card['id'], "tech bots"):
+            print("ERROR(tech bots): set webhook to card")
 
         return add_card_to_database
 
