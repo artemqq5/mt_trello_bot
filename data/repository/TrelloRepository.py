@@ -38,7 +38,7 @@ class TrelloRepository(TrelloManager):
                 voice=data['voice'],
                 source=data['source'],
                 count=data['count'],
-                username=user['username'],
+                username=user.get('username') or "N/A",
                 desc=data['desc'],
             ),
             card_date=data.get('deadline', None),
